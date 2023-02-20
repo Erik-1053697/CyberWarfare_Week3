@@ -21,6 +21,9 @@ var objPeople = [
         password: "Test123"
     }
 ]
+function setSessionCookie(username) {
+  Cookies.set('session', username);
+}
 
 function getInfo() {
     var username = document.getElementById('username').value
@@ -30,6 +33,7 @@ function getInfo() {
         // check is user input matches username and password of a current index of the objPeople array
         if (username == objPeople[i].username && password == objPeople[i].password) {
             console.log(username + " is logged in!")
+            setSessionCookie(username);
             window.location.href = "https://www.google.com"
             // stop the function if this is found to be true
             return;
@@ -39,10 +43,22 @@ function getInfo() {
     return "Incorrect username or password";
 }
 
+function isLoggedIn() {
+  return Cookies.get('session') !== undefined;
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.querySelector("#login");
     const createAccountForm = document.querySelector("#createAccount");
 
+    if (isLoggedIn()) {
+        loginForm.classList.add("form--hidden");
+        createAccountForm.classList.add("form--hidden");
+  } else {
+        loginForm.classList.remove("form--hidden");
+        createAccountForm.classList.add("form--hidden");
+  }
     document.querySelector("#linkCreateAccount").addEventListener("click", e => {
         e.preventDefault();
         loginForm.classList.add("form--hidden");
@@ -55,12 +71,17 @@ document.addEventListener("DOMContentLoaded", () => {
         createAccountForm.classList.add("form--hidden");
     });
 
-    // login klik
+    // login click
     loginForm.addEventListener("submit", e => {
         e.preventDefault();
 
         err = getInfo();
         if (err) { setFormMessage(loginForm, "error", `${err}`) }
+
+        if (isLoggedIn()) {
+            loginForm.classList.add("form--hidden");
+            createAccountForm.classList.add("form--hidden");
+        }
     });
 
     document.querySelectorAll(".form__input").forEach(inputElement => {
@@ -75,3 +96,4 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
