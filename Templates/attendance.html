@@ -1,0 +1,33 @@
+<table>
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="attendance-table-body">
+    </tbody>
+</table>
+<script>
+    function updateAttendanceTable(date) {
+        $.ajax({
+            url: '/attendance',
+            method: 'POST',
+            data: { 'date': date },
+            success: function (data) {
+                // Clear the table body
+                $('#attendance-table-body').empty();
+
+                // Add a row for each student in the attendance report
+                data['present'].forEach(function (studentName) {
+                    $('#attendance-table-body').append('<tr><td>' + studentName + '</td><td>Present</td></tr>');
+                });
+                data['absent'].forEach(function (studentName) {
+                    $('#attendance-table-body').append('<tr><td>' + studentName + '</td><td>Absent</td></tr>');
+                });
+            },
+            error: function () {
+                alert('Error fetching attendance data');
+            }
+        });
+    }

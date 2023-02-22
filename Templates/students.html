@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Students</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>Students</h1>
+
+    <div id="students"></div>
+
+    <div id="new-student">
+        <h2>New Student</h2>
+        <label for="name">Name:</label>
+        <input type="text" id="name">
+        <button id="save-student">Save</button>
+    </div>
+
+    <script>
+        // Show all students
+        $.ajax({
+            url: '/student',
+            type: 'GET',
+            success: function (students) {
+                // Display the list of students
+                var html = '';
+                students.forEach(function (student) {
+                    html += '<div>' + student.name + ' <button class="delete-student" data-id="' + student.id + '">Delete</button></div>';
+                });
+                $('#students').html(html);
+
+                // Add event listeners to the delete buttons
+                $('#students').on('click', '.delete-student', function () {
+                    var button = $(this);
+                    var id = button.data('id');
+                    $.ajax({
+                        url: '/student/' + id,
+                        type: 'DELETE',
+                        success: function () {
+                            // Remove the student from the list
+                            button.parent().remove();
+
+                            // Display success message
+                            alert('Student deleted successfully');
+                        }
+                    });
+                });
+            }
+        });
+
+        // Save a new student
+        $('#save-student').on('click', function () {
+            var name = $('#name').val();
+            $.ajax({
+                url: '/student',
+                type: 'POST',
+                data: JSON.stringify({ name: name }),
+                contentType: 'application/json',
+                success: function (student) {
+                    // Display the new student's information
+                    var html = '<div>' + student.name + ' <button class="delete-student" data-id="' + student.id + '">Delete</button></div>';
+                    $('#students').append(html);
+
+                    // Add event listener to the new delete button
+                    $('#students').find('.delete-student[data-id="' + student.id + '"]').on('click', function () {
+                        var id = $(this).data('id');
+                        $.ajax({
+                            url: '/student/' + id,
+                            type: 'DELETE',
+                            success: function () {
+                                // Remove the student from the list
+                                $(this).parent().remove();
+
+                                // Display success message
+                                // alert('Student deleted successfully');
+                            }
+                        });
+                    });
+
+                    // Display success message
+                    alert('Student created successfully');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

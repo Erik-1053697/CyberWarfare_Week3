@@ -1,0 +1,151 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<h2>Create Meeting</h2>
+<form id="create-meeting-form">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title"><br><br>
+    <label for="teacher">Teacher:</label>
+    <input type="text" id="teacher" name="teacher"><br><br>
+    <label for="date">Date:</label>
+    <input type="date" id="date" name="date"><br><br>
+    <label for="time">Time:</label>
+    <input type="time" id="time" name="time"><br><br>
+    <button type="submit">Create</button>
+</form>
+
+<h2>All Meetings</h2>
+<table id="meetings-table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Teacher</th>
+            <th>Date</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<h2>Update Meeting</h2>
+<form id="update-meeting-form">
+    <label for="update-meeting-id">Meeting ID:</label>
+    <input type="text" id="update-meeting-id" name="id"><br><br>
+    <label for="update-meeting-title">Title:</label>
+    <input type="text" id="update-meeting-title" name="title"><br><br>
+    <label for="update-meeting-teacher">Teacher:</label>
+    <input type="text" id="update-meeting-teacher" name="teacher"><br><br>
+    <label for="update-meeting-date">Date:</label>
+    <input type="date" id="update-meeting-date" name="date"><br><br>
+    <label for="update-meeting-time">Time:</label>
+    <input type="time" id="update-meeting-time" name="time"><br><br>
+    <button type="submit">Update</button>
+</form>
+
+<h2>Delete Meeting</h2>
+<form id="delete-meeting-form">
+    <label for="delete-meeting-id">Meeting ID:</label>
+    <input type="text" id="delete-meeting-id" name="id"><br><br>
+    <button type="submit">Delete</button>
+</form>
+
+<script>
+
+
+    // Add a new meeting
+    $('#create-meeting-form').submit(function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: '/meeting',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                title: $('#title').val(),
+                teacher: $('#teacher').val(),
+                date: $('#date').val(),
+                time: $('#time').val()
+            }),
+            success: function (response) {
+                console.log(response);
+                alert('Meeting created successfully');
+            },
+            error: function (error) {
+                console.log(error);
+                alert('Failed to create meeting');
+            }
+        });
+    });
+
+    // Show all meetings
+    $.ajax({
+        url: '/meeting',
+        type: 'GET',
+        success: function (response) {
+            console.log(response);
+            var tbody = $('#meetings-table tbody');
+            tbody.empty();
+            if (Array.isArray(response)) {
+                response.forEach(function (meeting) {
+                    var tr = $('<tr>');
+                    tr.append($('<td>').text(meeting.id));
+                    tr.append($('<td>').text(meeting.title));
+                    tr.append($('<td>').text(meeting.teacher));
+                    tr.append($('<td>').text(meeting.date));
+                    tr.append($('<td>').text(meeting.time));
+                    tbody.append(tr);
+                });
+            } else {
+                alert('Failed to get meetings');
+            }
+        },
+        error: function (error) {
+            console.log(error);
+            alert('Failed to get meetings');
+        }
+    });
+
+    // Update a meeting
+    $('#update-meeting-form').submit(function (event) {
+        event.preventDefault();
+        var id = $('#update-meeting-id').val();
+        $.ajax({
+            url: '/meeting/' + id,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                title: $('#update-meeting-title').val(),
+                teacher: $('#update-meeting-teacher').val(),
+                date: $('#update-meeting-date').val(),
+                time: $('#update-meeting-time').val()
+            }),
+            success: function (response) {
+                console.log(response);
+                alert('Meeting updated successfully');
+            },
+            error: function (error) {
+                console.log(error);
+                alert('Failed to update meeting');
+            }
+        });
+    });
+
+    // Delete a meeting
+    $('#delete-meeting-form').submit(function (event) {
+        event.preventDefault();
+        var id = $('#delete-meeting-id').val();
+        $.ajax({
+            url: '/meeting/' + id,
+            type: 'DELETE',
+            success: function (response) {
+                console.log(response);
+                alert('Meeting deleted successfully');
+            },
+            error: function (error) {
+                console.log(error);
+                alert('Failed to delete meeting');
+            }
+        });
+    });
+
+</script>

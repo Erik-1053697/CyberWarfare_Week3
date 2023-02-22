@@ -5,7 +5,7 @@
 - [x]
 - []
 
-# Structuur
+# Structure
 Starter repository voor Werkplaats 3. Deze repository bevat een Flask applicatie met een aantal van de componenten die we ook nodig hebben om de werkplaats opdracht uit te voeren: 
 - Een database
 - Templates
