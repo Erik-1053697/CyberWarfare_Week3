@@ -14,27 +14,47 @@ app.secret_key = 'mysecretkey'
 conn = sqlite3.connect('./database/wp3.db')
 c = conn.cursor()
 
-# @app.route('/check-in')
-# def check_in():
-#     return render_template('check-in.html')
-
+# render index template
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/attendance')
-def attendance():
-    return render_template('attendance.html')
+# Render calendar template
+@app.route('/calendar')
+def calendar():
+    return render_template('calendar.html')
 
+# Render meetings template
+@app.route('/meetings')
+def meetings():
+    return render_template('meetings.html')
+
+# Render students template
+@app.route('/students')
+def students():
+    return render_template('students.html')
+
+# Render teachers template
+@app.route('/teachers')
+def teachers():
+    return render_template('teachers.html')
+
+# Render classes template
+@app.route('/classes')
+def classes():
+    return render_template('classes.html')
+
+# login
+LOGIN_ROUTE = '/login'
 @app.route('/dashboard')
 def dashboard():
-    if 'username' not in session:
-        return redirect('/login')
+    if session.get('username') is None:
+        return redirect(LOGIN_ROUTE)
     else:
-        username = session['username']
-        
+        username = session.get('username', '')
         return render_template('dashboard.html', user=username)
 
+# register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -53,29 +73,22 @@ def register():
             return redirect('/')
     return render_template('register.html')
 
+# login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = sqlite3.connect('./database/wp3.db')
-        c = conn.cursor()
-        c.execute('SELECT * FROM students WHERE username = ? AND password = ?', (username, password))
-        user = c.fetchone()
-        conn.close()
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        with sqlite3.connect('./database/wp3.db') as conn:
+            c = conn.cursor()
+            c.execute('SELECT * FROM students WHERE username = ? AND password = ?', (username, password))
+            user = c.fetchone()
         if user is None:
-            return render_template('login.html', error='Invalid username or password')
-        elif user[1] != password:
             return render_template('login.html', error='Invalid username or password')
         else:
             session['username'] = username
             return redirect('/dashboard')
     return render_template('login.html')
-
-# Render the calendar template
-@app.route('/calendar')
-def calendar():
-    return render_template('calendar.html')
 
 # Handle GET requests to fetch events
 @app.route('/events')
@@ -129,7 +142,6 @@ def get_event(event_id):
     else:
         return jsonify({'error': 'Event not found'}), 404
 
-
 # Delete an event by id
 @app.route('/events/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
@@ -154,11 +166,6 @@ def delete_event(event_id):
     
     # Return a JSON response
     return jsonify(result), status
-
-# Render the meetings template
-@app.route('/meetings')
-def meetings():
-    return render_template('meetings.html')
 
 # Create a new meeting
 @app.route('/meeting', methods=['POST'])
@@ -206,18 +213,19 @@ def update_meeting(id):
     conn.close()
     return jsonify({'message': 'Meeting updated successfully'})
 
-@app.route('/meeting/<id>/checkin', methods=['PUT'])
-def update_meeting_checkin(id):
-    data = request.get_json()
-    conn = sqlite3.connect('./database/wp3.db')
-    c = conn.cursor()
-    c.execute("UPDATE meetings SET student_checkin=? WHERE id=?",
-              (data['student_checkin'], id))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'Meeting check-in updated successfully'})
+# Checkin?
+# @app.route('/meeting/<id>/checkin', methods=['PUT'])
+# def update_meeting_checkin(id):
+#     data = request.get_json()
+#     conn = sqlite3.connect('./database/wp3.db')
+#     c = conn.cursor()
+#     c.execute("UPDATE meetings SET student_checkin=? WHERE id=?",
+#               (data['student_checkin'], id))
+#     conn.commit()
+#     conn.close()
+#     return jsonify({'message': 'Meeting check-in updated successfully'})
 
-# Delete a meeting
+# delete meeting
 @app.route('/meeting/<id>', methods=['DELETE'])
 def delete_meeting(id):
     conn = sqlite3.connect('./database/wp3.db')
@@ -227,12 +235,7 @@ def delete_meeting(id):
     conn.close()
     return jsonify({'message': 'Meeting deleted successfully'})
 
-# Render the students template
-@app.route('/students')
-def students():
-    return render_template('students.html')
-
-# Show all students
+# show student
 @app.route('/student', methods=['GET'])
 def get_students():
     conn = sqlite3.connect('./database/wp3.db')
@@ -242,7 +245,7 @@ def get_students():
     conn.close()
     return jsonify([{'id': row[0], 'name': row[1]} for row in students])
 
-# Save a new student
+# save a student
 @app.route('/student', methods=['POST'])
 def create_student():
     conn = sqlite3.connect('./database/wp3.db')
@@ -255,22 +258,22 @@ def create_student():
     response = {'id': student_id, 'name': data['name'], 'message': message}
     return jsonify(response)
 
-# Show a specific student with all their checkins
-@app.route('/student/<int:student_id>', methods=['GET'])
-def get_student(student_id):
-    conn = sqlite3.connect('./database/wp3.db')
-    student = conn.execute('SELECT * FROM students WHERE id = ?', (student_id,)).fetchone()
-    checkins = conn.execute('SELECT * FROM checkins WHERE student_id = ?', (student_id,)).fetchall()
-    conn.close()
-    if student is None:
-        return jsonify({'error': 'Student not found'}), 404
-    return jsonify({
-        'id': student['id'],
-        'name': student['name'],
-        'checkins': [dict(row) for row in checkins]
-    })
+# show a specific student with all their checkins?
+# @app.route('/student/<int:student_id>', methods=['GET'])
+# def get_student(student_id):
+#     conn = sqlite3.connect('./database/wp3.db')
+#     student = conn.execute('SELECT * FROM students WHERE id = ?', (student_id,)).fetchone()
+#     checkins = conn.execute('SELECT * FROM checkins WHERE student_id = ?', (student_id,)).fetchall()
+#     conn.close()
+#     if student is None:
+#         return jsonify({'error': 'Student not found'}), 404
+#     return jsonify({
+#         'id': student['id'],
+#         'name': student['name'],
+#         'checkins': [dict(row) for row in checkins]
+#     })
 
-# Delete a student
+# delete student
 @app.route('/student/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id):
     conn = sqlite3.connect('./database/wp3.db')
@@ -280,6 +283,133 @@ def delete_student(student_id):
     message = f"Student with ID {student_id} has been deleted."
     response = {'message': message}
     return jsonify(response), 204
+
+# get teacher
+@app.route('/teacher', methods=['GET'])
+def get_teachers():
+    conn = sqlite3.connect('./database/wp3.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM teachers')
+    rows = cursor.fetchall()
+    conn.close()
+    return jsonify(rows)
+
+# save teacher
+@app.route('/teacher', methods=['POST'])
+def save_teacher():
+    conn = sqlite3.connect('./database/wp3.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO teachers (username, password, name) VALUES (?, ?, ?)', (request.json['username'], request.json['password'], request.json['name']))
+    conn.commit()
+    new_teacher_id = cursor.lastrowid
+    conn.close()
+    return jsonify({'id': new_teacher_id})
+
+# show specific teacher
+@app.route('/teacher/<int:id>', methods=['GET'])
+def get_teacher(id):
+    conn = sqlite3.connect('./database/wp3.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM teachers WHERE id = ?', (id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row is None:
+        return jsonify({'error': 'Teacher not found'}), 404
+    return jsonify(row)
+
+# update teacher
+@app.route('/teacher/<int:id>', methods=['PUT'])
+def update_teacher(id):
+    conn = sqlite3.connect('./database/wp3.db')
+    cursor = conn.cursor()
+    cursor.execute('UPDATE teachers SET username = ?, password = ?, name = ? WHERE id = ?', (request.json['username'], request.json['password'], request.json['name'], id))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+# delete teacher
+@app.route('/teacher/<int:id>', methods=['DELETE'])
+def delete_teacher(id):
+    conn = sqlite3.connect('./database/wp3.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM teachers WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+# get all classes
+@app.route('/class', methods=['GET'])
+def get_all_classes():
+    conn = sqlite3.connect('./database/wp3.db')
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM classes")
+    classes = c.fetchall()
+
+    conn.close()
+    return jsonify(classes)
+
+# save classes
+@app.route('/class', methods=['POST'])
+def save_class():
+    class_name = request.json['class_name']
+
+    conn = sqlite3.connect('./database/wp3.db')
+    c = conn.cursor()
+
+    c.execute("INSERT INTO classes (class_name) VALUES (?)", (class_name,))
+    class_id = c.lastrowid
+
+    conn.commit()
+    conn.close()
+    return jsonify({'class_id': class_id, 'class_name': class_name})
+
+# get classes
+@app.route('/class/<int:class_id>', methods=['GET'])
+def get_class(class_id):
+    conn = sqlite3.connect('./database/wp3.db')
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM classes WHERE class_id=?", (class_id,))
+    class_info = c.fetchone()
+
+    c.execute("SELECT * FROM students WHERE class_id=?", (class_id,))
+    students = c.fetchall()
+
+    conn.close()
+    return jsonify({'class_info': class_info, 'students': students})
+
+# update classes
+@app.route('/class/<int:class_id>', methods=['PUT'])
+def update_class(class_id):
+    class_name = request.json['class_name']
+    students = request.json['students']
+
+    conn = sqlite3.connect('./database/wp3.db')
+    c = conn.cursor()
+
+    c.execute("UPDATE classes SET class_name=? WHERE class_id=?", (class_name, class_id))
+
+    c.execute("DELETE FROM students WHERE class_id=?", (class_id,))
+    for student in students:
+        c.execute("INSERT INTO students (student_name, class_id) VALUES (?, ?)", (student, class_id))
+
+    conn.commit()
+    conn.close()
+    return jsonify({'class_id': class_id, 'class_name': class_name, 'students': students})
+
+# delete classes
+@app.route('/class/<int:class_id>', methods=['DELETE'])
+def delete_class(class_id):
+    conn = sqlite3.connect('./database/wp3.db')
+    c = conn.cursor()
+
+    c.execute("DELETE FROM classes WHERE class_id=?", (class_id,))
+    c.execute("DELETE FROM students WHERE class_id=?", (class_id,))
+
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Class deleted successfully'})
 
 # QR code
 @app.route("/checkin")
@@ -353,7 +483,7 @@ def logout():
    session.pop('loggedin', None)
    session.pop('id', None)
    session.pop('username', None)
-   session.pop('role', None)
+   # session.pop('role', None)
    # redirect to login page
    return redirect(url_for('login'))
 

@@ -26,6 +26,9 @@
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
         <a class="navbar-brand ps-3" href="/dashboard">Portal</a>
+        <!-- <div class="brand">
+            <img src="static/hr.png" width="100px" height="px" alt="logo">
+        </div> -->
     </nav>
 
     <!-- urls -->
@@ -35,22 +38,30 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading">Main</div>
-                        <a class="nav-link" href="/dashboard/calendar">
+                        <a class="nav-link" href="/dashboard">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
                         <div class="sb-sidenav-menu-heading">Teacher</div>
-                        <a class="nav-link" href="/attendance">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        <a class="nav-link" href="#">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-handshake"></i></i></div>
                             Meetings
                         </a>
-                        <a class="nav-link" href="/attendance">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        <a class="nav-link" href="#">
+                            <div class="sb-nav-link-icon"><i class="fa-sharp fa-solid fa-graduation-cap"></i></div>
                             Students
                         </a>
+                        <a class="nav-link" href="#">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+                            Teachers
+                        </a>
+                        <a class="nav-link" href="#">
+                            <div class="sb-nav-link-icon"><i class="fa-sharp fa-solid fa-school"></i></div>
+                            Classes
+                        </a>
                         <div class="sb-sidenav-menu-heading">Student</div>
-                        <a class="nav-link" href="/attendance">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        <a class="nav-link" href="#">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-clipboard-user"></i></div>
                             Attendance
                         </a>
 
@@ -60,6 +71,7 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                             Logout
                         </a>
+
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
@@ -90,7 +102,6 @@
             <script>
                 var calendar = $('#calendar').fullCalendar({
                     header: {
-
                         left: 'prev,next today',
                         center: 'title',
                         right: 'month,agendaWeek,agendaDay'

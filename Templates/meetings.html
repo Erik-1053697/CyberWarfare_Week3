@@ -1,151 +1,243 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!DOCTYPE html>
 
-<h2>Create Meeting</h2>
-<form id="create-meeting-form">
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title"><br><br>
-    <label for="teacher">Teacher:</label>
-    <input type="text" id="teacher" name="teacher"><br><br>
-    <label for="date">Date:</label>
-    <input type="date" id="date" name="date"><br><br>
-    <label for="time">Time:</label>
-    <input type="time" id="time" name="time"><br><br>
-    <button type="submit">Create</button>
-</form>
+<head>
 
-<h2>All Meetings</h2>
-<table id="meetings-table">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Title</th>
-            <th>Teacher</th>
-            <th>Date</th>
-            <th>Time</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+    <!-- Bootstrap -->
+    <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 
-<h2>Update Meeting</h2>
-<form id="update-meeting-form">
-    <label for="update-meeting-id">Meeting ID:</label>
-    <input type="text" id="update-meeting-id" name="id"><br><br>
-    <label for="update-meeting-title">Title:</label>
-    <input type="text" id="update-meeting-title" name="title"><br><br>
-    <label for="update-meeting-teacher">Teacher:</label>
-    <input type="text" id="update-meeting-teacher" name="teacher"><br><br>
-    <label for="update-meeting-date">Date:</label>
-    <input type="date" id="update-meeting-date" name="date"><br><br>
-    <label for="update-meeting-time">Time:</label>
-    <input type="time" id="update-meeting-time" name="time"><br><br>
-    <button type="submit">Update</button>
-</form>
-
-<h2>Delete Meeting</h2>
-<form id="delete-meeting-form">
-    <label for="delete-meeting-id">Meeting ID:</label>
-    <input type="text" id="delete-meeting-id" name="id"><br><br>
-    <button type="submit">Delete</button>
-</form>
-
-<script>
+    <!-- Datatable CSS -->
 
 
-    // Add a new meeting
-    $('#create-meeting-form').submit(function (event) {
-        event.preventDefault();
+</head>
+
+<style>
+    .btn-margin {
+        margin-right: 10px;
+    }
+</style>
+
+<body>
+
+    <!-- <h2>Create Meeting</h2>
+    <form id="create-meeting-form">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title"><br><br>
+        <label for="teacher">Teacher:</label>
+        <input type="text" id="teacher" name="teacher"><br><br>
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date"><br><br>
+        <label for="time">Time:</label>
+        <input type="time" id="time" name="time"><br><br>
+        <button type="submit">Create</button>
+    </form> -->
+
+    <!-- Button to trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMeetingModal">
+        Create Meeting
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="createMeetingModal" tabindex="-1" aria-labelledby="createMeetingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createMeetingModalLabel">Create Meeting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-meeting-form">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title">
+                        </div>
+                        <div class="mb-3">
+                            <label for="teacher" class="form-label">Teacher</label>
+                            <input type="text" class="form-control" id="teacher" name="teacher">
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="date" name="date">
+                        </div>
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Time</label>
+                            <input type="time" class="form-control" id="time" name="time">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="create-meeting-btn">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>All Meetings</h2>
+    <!-- Your HTML code for the table goes here -->
+    <table id="meetings-table" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Teacher</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <h2>Update Meeting</h2>
+    <form id="update-meeting-form">
+        <label for="update-meeting-id">Meeting ID:</label>
+        <input type="text" id="update-meeting-id" name="id"><br><br>
+        <label for="update-meeting-title">Title:</label>
+        <input type="text" id="update-meeting-title" name="title"><br><br>
+        <label for="update-meeting-teacher">Teacher:</label>
+        <input type="text" id="update-meeting-teacher" name="teacher"><br><br>
+        <label for="update-meeting-date">Date:</label>
+        <input type="date" id="update-meeting-date" name="date"><br><br>
+        <label for="update-meeting-time">Time:</label>
+        <input type="time" id="update-meeting-time" name="time"><br><br>
+        <button type="submit">Update</button>
+    </form>
+
+    <h2>Delete Meeting</h2>
+    <form id="delete-meeting-form">
+        <label for="delete-meeting-id">Meeting ID:</label>
+        <input type="text" id="delete-meeting-id" name="id"><br><br>
+        <button type="submit">Delete</button>
+    </form>
+
+    <!-- Your script code for the AJAX call and DataTables initialization goes here -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js"></script>
+    <!-- Datatable JS -->
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        //Add a new meeting
+        $('#create-meeting-form').submit(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: '/meeting',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    title: $('#title').val(),
+                    teacher: $('#teacher').val(),
+                    date: $('#date').val(),
+                    time: $('#time').val()
+                }),
+                success: function () {
+                    alert('Meeting created successfully');
+                    // table.ajax.reload();
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert('Failed to create meeting');
+                }
+            });
+        });
+
+        // Show all meetings
         $.ajax({
             url: '/meeting',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                title: $('#title').val(),
-                teacher: $('#teacher').val(),
-                date: $('#date').val(),
-                time: $('#time').val()
-            }),
+            type: 'GET',
             success: function (response) {
                 console.log(response);
-                alert('Meeting created successfully');
+                var table = $('#meetings-table').DataTable({
+                    data: response,
+                    columns: [
+                        { data: 'id' },
+                        { data: 'title' },
+                        { data: 'teacher' },
+                        { data: 'date' },
+                        { data: 'time' },
+                        {
+                            data: null,
+                            render: function (data, type, row) {
+                                return '<button class="btn btn-primary edit-button" data-id="' + data.id + '">Edit</button>' +
+                                    '<button class="btn btn-danger delete-button" data-id="' + data.id + '">Delete</button>';
+                            }
+                        }
+                    ]
+                });
+                // Delete meeting
+                $('#meetings-table').on('click', '.delete-button', function () {
+                    var id = $(this).data('id');
+                    if (confirm('Are you sure you want to delete this meeting?')) {
+                        $.ajax({
+                            url: '/meeting/' + id,
+                            type: 'DELETE',
+                            success: function () {
+                                alert('Meeting deleted successfully');
+                                table.ajax.reload();
+                            },
+                            error: function (error) {
+                                console.log(error);
+                                alert('Failed to delete meeting');
+                            }
+                        });
+                    }
+                });
             },
             error: function (error) {
                 console.log(error);
-                alert('Failed to create meeting');
-            }
-        });
-    });
-
-    // Show all meetings
-    $.ajax({
-        url: '/meeting',
-        type: 'GET',
-        success: function (response) {
-            console.log(response);
-            var tbody = $('#meetings-table tbody');
-            tbody.empty();
-            if (Array.isArray(response)) {
-                response.forEach(function (meeting) {
-                    var tr = $('<tr>');
-                    tr.append($('<td>').text(meeting.id));
-                    tr.append($('<td>').text(meeting.title));
-                    tr.append($('<td>').text(meeting.teacher));
-                    tr.append($('<td>').text(meeting.date));
-                    tr.append($('<td>').text(meeting.time));
-                    tbody.append(tr);
-                });
-            } else {
                 alert('Failed to get meetings');
             }
-        },
-        error: function (error) {
-            console.log(error);
-            alert('Failed to get meetings');
-        }
-    });
-
-    // Update a meeting
-    $('#update-meeting-form').submit(function (event) {
-        event.preventDefault();
-        var id = $('#update-meeting-id').val();
-        $.ajax({
-            url: '/meeting/' + id,
-            type: 'PUT',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                title: $('#update-meeting-title').val(),
-                teacher: $('#update-meeting-teacher').val(),
-                date: $('#update-meeting-date').val(),
-                time: $('#update-meeting-time').val()
-            }),
-            success: function (response) {
-                console.log(response);
-                alert('Meeting updated successfully');
-            },
-            error: function (error) {
-                console.log(error);
-                alert('Failed to update meeting');
-            }
         });
-    });
 
-    // Delete a meeting
-    $('#delete-meeting-form').submit(function (event) {
-        event.preventDefault();
-        var id = $('#delete-meeting-id').val();
-        $.ajax({
-            url: '/meeting/' + id,
-            type: 'DELETE',
-            success: function (response) {
-                console.log(response);
-                alert('Meeting deleted successfully');
-            },
-            error: function (error) {
-                console.log(error);
-                alert('Failed to delete meeting');
-            }
-        });
-    });
+    // // Update a meeting
+    // $('#update-meeting-form').submit(function (event) {
+    //     event.preventDefault();
+    //     var id = $('#update-meeting-id').val();
+    //     $.ajax({
+    //         url: '/meeting/' + id,
+    //         type: 'PUT',
+    //         contentType: 'application/json',
+    //         data: JSON.stringify({
+    //             title: $('#update-meeting-title').val(),
+    //             teacher: $('#update-meeting-teacher').val(),
+    //             date: $('#update-meeting-date').val(),
+    //             time: $('#update-meeting-time').val()
+    //         }),
+    //         success: function (response) {
+    //             console.log(response);
+    //             alert('Meeting updated successfully');
+    //         },
+    //         error: function (error) {
+    //             console.log(error);
+    //             alert('Failed to update meeting');
+    //         }
+    //     });
+    // });
 
-</script>
+    // // Delete a meeting
+    // $('#delete-meeting-form').submit(function (event) {
+    //     event.preventDefault();
+    //     var id = $('#delete-meeting-id').val();
+    //     $.ajax({
+    //         url: '/meeting/' + id,
+    //         type: 'DELETE',
+    //         success: function (response) {
+    //             console.log(response);
+    //             alert('Meeting deleted successfully');
+    //         },
+    //         error: function (error) {
+    //             console.log(error);
+    //             alert('Failed to delete meeting');
+    //         }
+    //     });
+    // });
+
+    </script>
+</body>
+
+</html>

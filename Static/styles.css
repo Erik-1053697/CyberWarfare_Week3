@@ -11324,6 +11324,7 @@ body {
 
 #layoutSidenav {
   display: flex;
+  border: 1px solid;
 }
 #layoutSidenav #layoutSidenav_nav {
   flex-basis: 225px;
