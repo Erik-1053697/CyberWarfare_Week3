@@ -3,6 +3,7 @@ from io import BytesIO
 import uuid
 import qrcode
 import base64
+import json
 from flask import Flask, session, render_template, redirect, url_for, request, jsonify, flash, make_response
 
 app = Flask(__name__)
@@ -179,6 +180,27 @@ def create_meeting():
     conn.close()
     return jsonify({'message': 'Meeting created successfully'})
 
+# Get a specific meeting
+@app.route('/meeting/<id>', methods=['GET'])
+def get_meeting(id):
+    conn = sqlite3.connect('./database/wp3.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM meetings WHERE id=?", (id,))
+    meeting = c.fetchone()
+    conn.close()
+
+    if meeting:
+        meeting_dict = {
+            'id': meeting[0],
+            'title': meeting[1],
+            'teacher': meeting[2],
+            'date': meeting[3],
+            'time': meeting[4]
+        }
+        return jsonify(meeting_dict)
+    else:
+        return jsonify({'error': 'Meeting not found'})
+
 # Show all meetings
 @app.route('/meeting', methods=['GET'])
 def get_all_meetings():
@@ -205,13 +227,19 @@ def get_meetings_by_teacher(teacher):
 @app.route('/meeting/<id>', methods=['PUT'])
 def update_meeting(id):
     data = request.get_json()
-    conn = sqlite3.connect('./database/wp3.db')
-    c = conn.cursor()
-    c.execute("UPDATE meetings SET title=?, teacher=?, date=?, time=? WHERE id=?",
-              (data['title'], data['teacher'], data['date'], data['time'], id))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'Meeting updated successfully'})
+    if isinstance(data, dict):
+        conn = sqlite3.connect('./database/wp3.db')
+        c = conn.cursor()
+        c.execute("""
+            UPDATE meetings
+            SET title=?, teacher=?, date=?, time=?
+            WHERE id=?
+        """, (data['title'], data['teacher'], data['date'], data['time'], id))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Meeting updated successfully'})
+    else:
+        return jsonify({'error': 'Invalid data format'})
 
 # Checkin?
 # @app.route('/meeting/<id>/checkin', methods=['PUT'])

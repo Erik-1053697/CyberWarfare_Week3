@@ -5,15 +5,18 @@
 <style>
     #calendar {
         max-width: 1000px;
-        margin: 20px auto;
+        margin: 40px auto;
         padding: 0 10px;
         font-size: 14px;
     }
 
     .fc-title {
-        color: #0052ba;
-        background: #fff;
-        font-size: 15px;
+        position: relative;
+        display: block;
+        font-size: .85em;
+        line-height: 1.4;
+        border-radius: 3px;
+        border: 1px solid #3788d8;
     }
 
     .fc h2 {
@@ -26,9 +29,6 @@
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
         <a class="navbar-brand ps-3" href="/dashboard">Portal</a>
-        <!-- <div class="brand">
-            <img src="static/hr.png" width="100px" height="px" alt="logo">
-        </div> -->
     </nav>
 
     <!-- urls -->
@@ -37,11 +37,13 @@
             <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
+                        <!-- main--->
                         <div class="sb-sidenav-menu-heading">Main</div>
                         <a class="nav-link" href="/dashboard">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
+                        <!-- teacher -->
                         <div class="sb-sidenav-menu-heading">Teacher</div>
                         <a class="nav-link" href="#">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-handshake"></i></i></div>
@@ -59,12 +61,13 @@
                             <div class="sb-nav-link-icon"><i class="fa-sharp fa-solid fa-school"></i></div>
                             Classes
                         </a>
+                        <!--student-->
                         <div class="sb-sidenav-menu-heading">Student</div>
                         <a class="nav-link" href="#">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-clipboard-user"></i></div>
                             Attendance
                         </a>
-
+                        <!-- account-->
                         <div class="sb-sidenav-menu-heading">Account</div>
 
                         <a class="nav-link" href="/logout">
@@ -76,36 +79,32 @@
                 </div>
                 <div class="sb-sidenav-footer">
                     <p>You are logged in.</p>
-
                     <div class="small">Logged in as: {{ user }}</div>
-                    <!-- <a href="/logout">Logout</a> -->
                 </div>
             </nav>
         </div>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/nl.js'></script>
 
-        <!-- data-table -->
+        <!-- calendar -->
         <div id="layoutSidenav_content">
             <main>
-                <div class="container-fluid px-4">
-                    <ol class="breadcrumb mb-4">
-                        <!-- <li class="breadcrumb-item active">Dashboard</li> -->
-                    </ol>
-                    <div class="row">
-
-                    </div>
-
-                    <div id='calendar'></div>
-
-                </div>
+                <div id='calendar'></div>
             </main>
-
             <script>
+
                 var calendar = $('#calendar').fullCalendar({
+
+                    slotLabelFormat: ['H:mm'],
+
                     header: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'month,agendaWeek,agendaDay'
+                        right: 'month,agendaWeek,agendaDay,listMonth'
+
                     },
+
+                    locale: 'nl',
+                    weekNumbers: true,
                     defaultView: 'agendaWeek',
                     selectable: true,
                     selectHelper: true,
