@@ -3,7 +3,6 @@ from io import BytesIO
 import uuid
 import qrcode
 import base64
-import json
 from flask import Flask, session, render_template, redirect, url_for, request, jsonify, flash, make_response
 
 app = Flask(__name__)
@@ -28,7 +27,11 @@ def calendar():
 # Render meetings template
 @app.route('/meetings')
 def meetings():
-    return render_template('meetings.html')
+    if session.get('username') is None:
+        return redirect(LOGIN_ROUTE)
+    else:
+        username = session.get('username', '')
+        return render_template('meetings.html', user=username)
 
 # Render students template
 @app.route('/students')
