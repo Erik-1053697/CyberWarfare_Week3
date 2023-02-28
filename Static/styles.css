@@ -662,7 +662,7 @@ progress {
 }
 @media (min-width: 1400px) {
   .container-xxl, .container-xl, .container-lg, .container-md, .container-sm, .container {
-    max-width: 1320px;
+    max-width: 1400px;
   }
 }
 .row {
@@ -3048,7 +3048,7 @@ textarea.form-control-lg {
   color: #fff;
   background-color: #0d6efd;
   border-color: #0d6efd;
-  width: 200px;
+  /* width: 200px; */
   margin: auto;
 }
 .btn-primary:hover {
