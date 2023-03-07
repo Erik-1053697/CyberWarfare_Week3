@@ -18,7 +18,7 @@
         max-width: 1000px;
         margin: 40px auto;
         padding: 0 10px;
-        font-size: 14px;
+        font-size: 15px;
     }
 
     .fc-title {
@@ -39,9 +39,16 @@
 
 <!-- calendar -->
 <div id="layoutSidenav_content">
-    <main>
-        <div id='calendar'></div>
-    </main>
+    <div class="container-fluid px-4">
+        <main>
+            <h2 class="mt-4">Schedule</h2>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item active">Schedule</li>
+            </ol>
+            <div id='calendar'></div>
+        </main>
+    </div>
     <script>
 
         var calendar = $('#calendar').fullCalendar({

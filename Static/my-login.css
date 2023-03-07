@@ -33,7 +33,11 @@ body.my-login-page {
 }
 
 .my-login-page .card-wrapper {
-	/* width: 400px; */
+	width: 400px;
+}
+
+.my-login-checkin .card-wrapper-checkin {
+	width: 400px;
 }
 
 .my-login-page .card {

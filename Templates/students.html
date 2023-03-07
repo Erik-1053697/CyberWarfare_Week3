@@ -1,90 +1,183 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
 
-<head>
-    <title>Students</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
+{% block content %}
 
-<body>
-    <h1>Students</h1>
-
-    <div id="students"></div>
-
-    <div id="new-student">
-        <h2>New Student</h2>
-        <label for="name">Name:</label>
-        <input type="text" id="name">
-        <button id="save-student">Save</button>
+<div id="layoutSidenav_content">
+    <!-- Button to trigger modal -->
+    <div class="modal fade" id="createStudentsModal" tabindex="-1" aria-labelledby="createStudentsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createStudentsModalLabel">Create Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-student-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="class_id" class="form-label">Class</label>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="classDropdownButton"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select Class
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="classDropdownButton">
+                                    <li><a class="dropdown-item" href="#" data-value="Class 1A">1A</a></li>
+                                    <li><a class="dropdown-item" href="#" data-value="Class 1B">1B</a></li>
+                                    <li><a class="dropdown-item" href="#" data-value="Class 1C">1C</a></li>
+                                    <li><a class="dropdown-item" href="#" data-value="Class 1D">1D</a></li>
+                                </ul>
+                                <input type="hidden" name="class_id" id="class_id" required>
+                            </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        id="close-student-btn">Close</button>
+                    <button type="submit" class="btn btn-primary" id="create-student-btn">Create</button>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container-fluid px-4">
+            <h2 class="mt-4">Students</h2>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item active">Students</li>
+            </ol>
+            <!-- <div class="card mb-4">
+                    <div class="card-body">
+                        DataTables is a third party plugin that is used to generate the demo table below. For more
+                        information about DataTables, please visit the
+                        <a target="_blank" href="https://datatables.net/">official DataTables documentation</a>
+
+                    </div>
+                </div> -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStudentsModal">
+                Create Student
+            </button><br><br>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    Students Table
+                </div>
+                <div class="card-body">
+                    <table id="students-table" class="display">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>username</th>
+                                <!-- <th>password</th> -->
+                                <th>email</th>
+                                <th>class</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
+
+        // Validation
+        function validateForm() {
+            var form = document.getElementById("create-student-form");
+            if (!form.checkValidity()) {
+                // If the form is not valid, display an error message
+                alert("Please fill in all required fields.");
+                return false;
+            }
+            return true;
+        }
+
         // Show all students
         $.ajax({
             url: '/student',
             type: 'GET',
-            success: function (students) {
-                // Display the list of students
-                var html = '';
-                students.forEach(function (student) {
-                    html += '<div>' + student.name + ' <button class="delete-student" data-id="' + student.id + '">Delete</button></div>';
-                });
-                $('#students').html(html);
+            success: function (response) {
+                console.log(response);
+                var table = $('#students-table').DataTable({
+                    data: response,
+                    columns: [
+                        { data: 'id' },
+                        { data: 'name' },
+                        // { data: 'password' },
+                        { data: 'student_name' },
+                        { data: 'class_id' },
+                        {
+                            data: null,
+                            render: function (data, type, row) {
+                                return '<button class="edit-button btn-margin" data-id="' + data.id + '"><i class="fas fa-edit"></i></button>' +
+                                    '<button class="delete-button" data-id="' + data.id + '"><i class="fas fa-trash"></i></button>';
 
-                // Add event listeners to the delete buttons
-                $('#students').on('click', '.delete-student', function () {
-                    var button = $(this);
-                    var id = button.data('id');
-                    $.ajax({
-                        url: '/student/' + id,
-                        type: 'DELETE',
-                        success: function () {
-                            // Remove the student from the list
-                            button.parent().remove();
-
-                            // Display success message
-                            alert('Student deleted successfully');
+                            }
                         }
-                    });
+                    ]
+                });
+
+                $('#create-student-btn').click(function () {
+                    $('#create-student-form').submit();
+                });
+
+                // Clear form fields when modal is closed
+                $('#createStudentsModal').on('hidden.bs.modal', function () {
+                    $(this).find('form')[0].reset();
+                });
+
+                // Clear form fields when modal is closed
+                $('#updateStudentsModal').on('hidden.bs.modal', function () {
+                    $(this).find('form')[0].reset();
+                });
+
+                // Set the class name when a dropdown item is selected
+                $('.dropdown-item').click(function () {
+                    var selectedValue = $(this).data('value');
+                    $('#classDropdownButton').text(selectedValue);
+                    $('#class_id').val(selectedValue);
+                });
+
+                // Add a new student
+                $('#create-student-form').submit(function (event) {
+                    event.preventDefault();
+                    if (validateForm()) { // Call the validateForm() function
+                        $.ajax({
+                            url: '/student',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                username: $('#username').val(),
+                                email: $('#email').val(),
+                                class_id: $('#class_id').val()
+                            }),
+                            success: function () {
+                                alert('Student created successfully');
+                                $('#createStudentsModal').modal('hide'); // hide the modal
+                                location.reload(); // Reload the page
+                            },
+                            error: function (error) {
+                                console.log(error);
+                                alert('Failed to create student');
+                            }
+                        });
+                    }
                 });
             }
         });
 
-        // Save a new student
-        $('#save-student').on('click', function () {
-            var name = $('#name').val();
-            $.ajax({
-                url: '/student',
-                type: 'POST',
-                data: JSON.stringify({ name: name }),
-                contentType: 'application/json',
-                success: function (student) {
-                    // Display the new student's information
-                    var html = '<div>' + student.name + ' <button class="delete-student" data-id="' + student.id + '">Delete</button></div>';
-                    $('#students').append(html);
-
-                    // Add event listener to the new delete button
-                    $('#students').find('.delete-student[data-id="' + student.id + '"]').on('click', function () {
-                        var id = $(this).data('id');
-                        $.ajax({
-                            url: '/student/' + id,
-                            type: 'DELETE',
-                            success: function () {
-                                // Remove the student from the list
-                                $(this).parent().remove();
-
-                                // Display success message
-                                // alert('Student deleted successfully');
-                            }
-                        });
-                    });
-
-                    // Display success message
-                    alert('Student created successfully');
-                }
-            });
-        });
     </script>
-</body>
 
-</html>
+    {% endblock %}
