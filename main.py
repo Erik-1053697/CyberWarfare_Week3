@@ -42,22 +42,21 @@ def students():
         username = session.get('username', '')
         return render_template('students.html', user=username)
 
+@app.route('/checkin')
+def checkin():
+    code = request.args.get('code')
+    return render_template('checkin.html', code=code)
+
+
 # render index template
-@app.route('/')
-def index():
-    return render_template('index.html')
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
 
 # Render calendar template
 @app.route('/calendar')
 def calendar():
     return render_template('calendar.html')
-
-
-
-# # Render students template
-# @app.route('/students')
-# def students():
-#     return render_template('students.html')
 
 # Render teachers template
 @app.route('/teachers')
@@ -69,28 +68,13 @@ def teachers():
 def classes():
     return render_template('classes.html')
 
-
-
-# register
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = sqlite3.connect('./database/wp3.db')
-        c = conn.cursor()
-        c.execute('SELECT * FROM students WHERE username = ?', (username,))
-        existing_user = c.fetchone()
-        if existing_user:
-            return 'That username is already taken!'
-        else:
-            c.execute('INSERT INTO students VALUES (?, ?)', (username, password))
-            conn.commit()
-            conn.close()
-            return redirect('/')
-    return render_template('register.html')
+# Render form template
+@app.route("/form")
+def show_form():
+    return render_template("form.html")
 
 # login
+@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -108,7 +92,7 @@ def login():
     return render_template('login.html')
 
 # Handle GET requests to fetch events
-@app.route('/events')
+@app.route('/v1/events')
 def get_events():
     conn = sqlite3.connect('./database/wp3.db')
     c = conn.cursor()
@@ -118,7 +102,7 @@ def get_events():
     return jsonify(events)
 
 # Handle POST requests to create or update events
-@app.route('/events', methods=['POST'])
+@app.route('/v1/events', methods=['POST'])
 def create_event():
     data = request.get_json()
     title = data['title']
@@ -142,7 +126,7 @@ def create_event():
     return jsonify(data)
 
 # Get a specific event by ID
-@app.route('/events/<int:event_id>', methods=['GET'])
+@app.route('/v1/events/<int:event_id>', methods=['GET'])
 def get_event(event_id):
     conn = sqlite3.connect('./database/wp3.db')
     cur = conn.cursor()
@@ -160,7 +144,7 @@ def get_event(event_id):
         return jsonify({'error': 'Event not found'}), 404
 
 # Delete an event by id
-@app.route('/events/<int:event_id>', methods=['DELETE'])
+@app.route('/v1/events/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
     # Connect to the database
     conn = sqlite3.connect('./database/wp3.db')
@@ -185,7 +169,7 @@ def delete_event(event_id):
     return jsonify(result), status
 
 # Create a new meeting
-@app.route('/meeting', methods=['POST'])
+@app.route('/v1/meeting', methods=['POST'])
 def create_meeting():
     data = request.get_json()
     conn = sqlite3.connect('./database/wp3.db')
@@ -197,7 +181,7 @@ def create_meeting():
     return jsonify({'message': 'Meeting created successfully'})
 
 # Get a specific meeting
-@app.route('/meeting/<id>', methods=['GET'])
+@app.route('/v1/meeting/<id>', methods=['GET'])
 def get_meeting(id):
     conn = sqlite3.connect('./database/wp3.db')
     c = conn.cursor()
@@ -218,7 +202,7 @@ def get_meeting(id):
         return jsonify({'error': 'Meeting not found'})
 
 # Show all meetings
-@app.route('/meeting', methods=['GET'])
+@app.route('/v1/meeting', methods=['GET'])
 def get_all_meetings():
     conn = sqlite3.connect('./database/wp3.db')
     c = conn.cursor()
@@ -230,7 +214,7 @@ def get_all_meetings():
     return jsonify(meetings_dict)
 
 # Show all meetings for a teacher
-@app.route('/meeting/<teacher>', methods=['GET'])
+@app.route('/v1/meeting/<teacher>', methods=['GET'])
 def get_meetings_by_teacher(teacher):
     conn = sqlite3.connect('./database/wp3.db')
     c = conn.cursor()
@@ -240,7 +224,7 @@ def get_meetings_by_teacher(teacher):
     return jsonify(meetings)
 
 # Update a meeting
-@app.route('/meeting/<id>', methods=['PUT'])
+@app.route('/v1/meeting/<id>', methods=['PUT'])
 def update_meeting(id):
     data = request.get_json()
     if isinstance(data, dict):
@@ -259,25 +243,25 @@ def update_meeting(id):
 
 # Checkin?
 # Update a meeting with a checkin from a student
-@app.route('/meeting/<meetingId>', methods=['PATCH'])
-def update_meeting_checkin(meetingId):
-    data = request.get_json()
-    if isinstance(data, dict):
-        conn = sqlite3.connect('./database/wp3.db')
-        c = conn.cursor()
-        c.execute("""
-            UPDATE meetings
-            SET checkin=?
-            WHERE id=?
-        """, (data['checkin'], meetingId))
-        conn.commit()
-        conn.close()
-        return jsonify({'message': 'Check-in updated successfully'})
-    else:
-        return jsonify({'error': 'Invalid data format'})
+# @app.route('/meeting/<meetingId>', methods=['PATCH'])
+# def update_meeting_checkin(meetingId):
+#     data = request.get_json()
+#     if isinstance(data, dict):
+#         conn = sqlite3.connect('./database/wp3.db')
+#         c = conn.cursor()
+#         c.execute("""
+#             UPDATE meetings
+#             SET checkin=?
+#             WHERE id=?
+#         """, (data['checkin'], meetingId))
+#         conn.commit()
+#         conn.close()
+#         return jsonify({'message': 'Check-in updated successfully'})
+#     else:
+#         return jsonify({'error': 'Invalid data format'})
 
 # delete meeting
-@app.route('/meeting/<id>', methods=['DELETE'])
+@app.route('/v1/meeting/<id>', methods=['DELETE'])
 def delete_meeting(id):
     conn = sqlite3.connect('./database/wp3.db')
     c = conn.cursor()
@@ -287,7 +271,7 @@ def delete_meeting(id):
     return jsonify({'message': 'Meeting deleted successfully'})
 
 # show student
-@app.route('/student', methods=['GET'])
+@app.route('/v1/student', methods=['GET'])
 def get_students():
     conn = sqlite3.connect('./database/wp3.db')
     conn.cursor()
@@ -296,17 +280,17 @@ def get_students():
     conn.close()
     return jsonify([{'id': row[0], 'name': row[1], 'password': row[2], 'student_name': row[3] , 'class_id': [row[4]]} for row in students])
 
-# save a student
-@app.route('/student', methods=['POST'])
+# create a student
+@app.route('/v1/student', methods=['POST'])
 def create_student():
     conn = sqlite3.connect('./database/wp3.db')
     data = request.json
-    conn.execute('INSERT INTO students (username, email, class_id) VALUES (?, ?, ?)', (data['username'], data['email'], data['class_id']))
+    conn.execute('INSERT INTO students (username, password, email, class_id) VALUES (?, ?, ?, ?)', (data['username'], data['password'], data['email'], data['class_id']))
     conn.commit()
     student_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
     conn.close()
     message = f"Student {data['username']} has been created"
-    response = {'id': student_id, 'name': data['username'], 'message': message}
+    response = {'id': student_id, 'name': data['username'],  'password': data['password'], 'message': message}
     return jsonify(response)
 
 # show a specific student with all their checkins?
@@ -325,7 +309,7 @@ def create_student():
 #     })
 
 # delete student
-@app.route('/student/<int:student_id>', methods=['DELETE'])
+@app.route('/v1/student/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id):
     conn = sqlite3.connect('./database/wp3.db')
     conn.execute('DELETE FROM students WHERE id = ?', (student_id,))
@@ -463,12 +447,12 @@ def delete_class(class_id):
     return jsonify({'message': 'Class deleted successfully'})
 
 # QR code
-@app.route("/checkin")
+@app.route("/v1/checkin", methods=["GET"])
 def check_in():
     connection = sqlite3.connect('./database/wp3.db')
     # Generate a new QR code with a unique ID and URL
     code = str(uuid.uuid4())
-    url = "http://127.0.0.1:5000/form/" + code
+    url = "/form?code=" + code
 
     cursor = connection.cursor()
     try:
@@ -483,8 +467,8 @@ def check_in():
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
+        box_size=12,
+        border=2,
     )
     qr.add_data(url)
     qr.make(fit=True)
@@ -493,74 +477,46 @@ def check_in():
     img.save(buffer, "PNG")
     qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-    return render_template("checkin.html", qr_code=qr_code, url=url)
-
-# Insert QR code data
-# @app.route("/form/<code>", methods=["GET", "POST"])
-# def form(code):
-#     connection = sqlite3.connect('./database/wp3.db', check_same_thread = False)
-#     connection.row_factory = sqlite3.Row
-
-#     # Check if the code has already been used
-#     cursor = connection.cursor()
-#     used = cursor.execute("SELECT * FROM attendance WHERE qr_code_id=?", (code,)).fetchone()
-#     if used:
-#         connection.close()
-#         return render_template("failure.html", message="QR code has already been used.")
-
-#     if request.method == "POST":
-#         username = request.form["username"]
-#         password = request.form["password"]
-#         #
-#         student = cursor.execute("SELECT * FROM students WHERE username=?", (username,)).fetchone()
-#         #
-#         # Check if the student's information is correct
-#         if student and student[1] == password:
-#             check_in_time = datetime.datetime.now()
-#             connection.execute("INSERT INTO attendance (qr_code_id, student_id, check_in_time) VALUES (?, ?, ?)", (code, username, check_in_time))
-#             connection.commit()
-#             connection.close()
-#             return render_template("success.html")
-#         else:
-#             connection.close()
-#             return render_template("failure.html", message="Incorrect username or password.")
-#     else:
-#         return render_template("form.html", code=code)
-
-
-# Example meeting data
-meetings = {
-    "meeting1": {
-        "checkin": False,
-        "students": []
-    },
-    "meeting2": {
-        "checkin": False,
-        "students": []
+    response = {
+        "qr_code": qr_code,
+        "url": url
     }
-}
+    return jsonify(response)
 
-@app.route('/checking/<string:meeting_id>', methods=['PUT'])
-def updatee_meeting(meeting_id):
-    # Get the meeting data from the meetings dictionary
-    meeting_data = meetings.get(meeting_id)
+@app.route('/v1/form', methods=['GET'])
+def get_form():
+    conn = sqlite3.connect('./database/wp3.db')
+    conn.cursor()
+    students = conn.execute('SELECT * FROM checkins').fetchall()
+    conn.commit()
+    conn.close()
+    return jsonify([{'id': row[0], 'qr_code_id': row[1], 'student_id': row[2], 'checkin_time': row[3] , 'question_answer': [row[4]]} for row in students])
 
-    # If the meeting doesn't exist, return an error message
-    if not meeting_data:
-        return jsonify({"message": "Meeting not found"}), 404
+# route for submitting the check-in form
+@app.route("/v1/form/<code>", methods=['POST'])
+def submit_form(code):
+    try:
+        request_data = request.get_json()
 
-    # Parse the request body to get the check-in status and student ID
-    checkin = request.json.get('checkin')
-    student_id = request.json.get('studentId')
+        student_id = request_data["student_id"]
+        checkin_time = request_data["checkin_time"]
+        question_answer = request_data["question_answer"]
 
-    # Add the student ID to the list of students for the meeting
-    meeting_data['students'].append(student_id)
-
-    # Update the check-in status for the meeting
-    meeting_data['checkin'] = checkin
-
-    # Return a success message and the updated meeting data
-    return jsonify({"message": "Meeting updated successfully", "data": meeting_data}), 200
+        connection = sqlite3.connect("./database/wp3.db")
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO checkins (student_id, checkin_time, question_answer, qr_code_id) VALUES (?, ?, ?, ?)", (student_id, checkin_time, question_answer, code))
+        connection.commit()
+        cursor.close()
+        
+        response = {
+            "message": "Student {student_id} checked in at {checkin_time}"
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        response = {
+            "message": "An error occurred"
+        }
+        return jsonify(response), 500
 
 # logout page
 @app.route('/logout')

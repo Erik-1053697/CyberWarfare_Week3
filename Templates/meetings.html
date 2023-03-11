@@ -2,16 +2,6 @@
 
 {% block content %}
 
-<style>
-    .btn-margin {
-        margin-right: 10px;
-    }
-
-    body {
-        padding-right: 0 !important
-    }
-</style>
-
 <div id="layoutSidenav_content">
 
     <div class="container-fluid px-4">
@@ -61,19 +51,19 @@
                     <form id="create-meeting-form">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title">
+                            <input type="text" class="form-control" id="title" name="title" required>
                         </div>
                         <div class="mb-3">
                             <label for="teacher" class="form-label">Teacher</label>
-                            <input type="text" class="form-control" id="teacher" name="teacher">
+                            <input type="text" class="form-control" id="teacher" name="teacher" required>
                         </div>
                         <div class="mb-3">
                             <label for="date" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="date" name="date">
+                            <input type="date" class="form-control" id="date" name="date" required>
                         </div>
                         <div class="mb-3">
                             <label for="time" class="form-label">Time</label>
-                            <input type="time" class="form-control" id="time" name="time">
+                            <input type="time" class="form-control" id="time" name="time" required>
                         </div>
                     </form>
                 </div>
@@ -99,19 +89,19 @@
                         <input type="hidden" id="edit-meeting-id" name="id">
                         <div class="mb-3">
                             <label for="edit-title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="edit-title" name="title">
+                            <input type="text" class="form-control" id="edit-title" name="title" required>
                         </div>
                         <div class="mb-3">
                             <label for="edit-teacher" class="form-label">Teacher</label>
-                            <input type="text" class="form-control" id="edit-teacher" name="teacher">
+                            <input type="text" class="form-control" id="edit-teacher" name="teacher" required>
                         </div>
                         <div class="mb-3">
                             <label for="edit-date" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="edit-date" name="date">
+                            <input type="date" class="form-control" id="edit-date" name="date" required>
                         </div>
                         <div class="mb-3">
                             <label for="edit-time" class="form-label">Time</label>
-                            <input type="time" class="form-control" id="edit-time" name="time">
+                            <input type="time" class="form-control" id="edit-time" name="time" required>
                         </div>
                     </form>
                 </div>
@@ -125,13 +115,41 @@
 
     <script>
 
+        // Submit form when create button is clicked
+        $('#create-meeting-btn').click(function () {
+            $('#create-meeting-form').submit();
+        });
+
+        // Clear form fields and remove active class when modal is closed
+        $('#createMeetingModal').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
+        });
+
+        // Clear form fields when update modal is closed
+        $('#updateMeetingModal').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
+        });
+
+        // Validate form
+        function validateForm() {
+            var form = document.getElementById("edit-meeting-form");
+            var form = document.getElementById("create-meeting-form");
+            if (!form.checkValidity()) {
+                // If the form is not valid, display an error message
+                alert("Please fill in all required fields.");
+                return false;
+            }
+            return true;
+        }
+
         // Show all meetings
         $.ajax({
-            url: '/meeting',
+            url: '/v1/meeting',
             type: 'GET',
             success: function (response) {
                 console.log(response);
                 var table = $('#meetings-table').DataTable({
+                    responsive: true,
                     data: response,
                     columns: [
                         { data: 'id' },
@@ -152,41 +170,28 @@
                 // Add a new meeting
                 $('#create-meeting-form').submit(function (event) {
                     event.preventDefault();
-                    $.ajax({
-                        url: '/meeting',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            title: $('#title').val(),
-                            teacher: $('#teacher').val(),
-                            date: $('#date').val(),
-                            time: $('#time').val()
-                        }),
-                        success: function () {
-                            alert('Meeting created successfully');
-                            $('#createMeetingModal').modal('hide'); // hide the modal
-                            location.reload(); // Reload the page
-                        },
-                        error: function (error) {
-                            console.log(error);
-                            alert('Failed to create meeting');
-                        }
-                    });
-                });
-
-                // Submit form when create button is clicked
-                $('#create-meeting-btn').click(function () {
-                    $('#create-meeting-form').submit();
-                });
-
-                // Clear form fields and remove active class when modal is closed
-                $('#createMeetingModal').on('hidden.bs.modal', function () {
-                    $(this).find('form')[0].reset();
-                });
-
-                // Clear form fields when update modal is closed
-                $('#updateMeetingModal').on('hidden.bs.modal', function () {
-                    $(this).find('form')[0].reset();
+                    if (validateForm()) {
+                        $.ajax({
+                            url: '/v1/meeting',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                title: $('#title').val(),
+                                teacher: $('#teacher').val(),
+                                date: $('#date').val(),
+                                time: $('#time').val()
+                            }),
+                            success: function () {
+                                alert('Meeting created successfully');
+                                $('#createMeetingModal').modal('hide'); // hide the modal
+                                location.reload(); // Reload the page
+                            },
+                            error: function (error) {
+                                console.log(error);
+                                alert('Failed to create meeting');
+                            }
+                        });
+                    }
                 });
 
                 // Update meeting
@@ -197,7 +202,7 @@
                     });
 
                     $.ajax({
-                        url: '/meeting/' + id,
+                        url: '/v1/meeting/' + id,
                         type: 'PUT',
                         data: JSON.stringify(data),
                         contentType: 'application/json',
@@ -218,7 +223,7 @@
                 $('#meetings-table').on('click', '.edit-button', function () {
                     id = $(this).data('id');
                     $.ajax({
-                        url: '/meeting/' + id,
+                        url: '/v1/meeting/' + id,
                         type: 'GET',
                         success: function (meeting) {
                             $('#editMeetingModal #edit-meeting-id').val(meeting.id);
@@ -240,7 +245,7 @@
                     var id = $(this).data('id');
                     if (confirm('Are you sure you want to delete this meeting?')) {
                         $.ajax({
-                            url: '/meeting/' + id,
+                            url: '/v1/meeting/' + id,
                             type: 'DELETE',
                             success: function () {
                                 alert('Meeting deleted successfully');
@@ -260,8 +265,6 @@
                 alert('Failed to get meetings');
             }
         });
-
-
 
     </script>
 

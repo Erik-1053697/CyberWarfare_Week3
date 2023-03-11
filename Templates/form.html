@@ -1,23 +1,113 @@
-<!-- templates/form.html -->
 <!DOCTYPE html>
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>QR Code Scanner</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Kodinger">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>HR - Check-in form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity=""
+        crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="static/my-login.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
-<body>
-    <h1>Fill in the form</h1>
-    <form action="{{ url_for('form', code=code) }}" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br><br>
-        <input type="submit" value="Submit">
-    </form>
+<body class="my-login-page">
+    <section class="h-100">
+        <div class="container h-100">
+            <div class="row justify-content-md-center h-100">
+                <div class="card-wrapper">
+
+                    <div class="brand">
+                        <img src="static/hr.png" alt="logo">
+                    </div>
+                    <div class="card fat">
+                        <div class="card-body">
+                            <div class="login">
+
+                                <h1>Check-in form</h1>
+
+                                <form id="checkin-form">
+                                    <div class="form-group">
+                                        <label for="student-id">Student ID:</label>
+                                        <input type="text" class="form-control" id="student-id" name="student_id"
+                                            required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="checkin-time">Check-in time:</label>
+                                        <input type="datetime-local" class="form-control" id="checkin-time"
+                                            name="checkin_time" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="question-answer">Question answer:</label>
+                                        <input type="text" class="form-control" id="question-answer"
+                                            name="question_answer" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+<script>
+
+    // Validate form
+    function validateForm() {
+        var form = document.getElementById("checkin-form");
+
+        if (!form.checkValidity()) {
+            // If the form is not valid, display an error message
+            alert("Please fill in all required fields.");
+            return false;
+        }
+        return true;
+    }
+
+    $(document).ready(function () {
+        // Submit the form when the submit button is clicked
+        $('#checkin-form').submit(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: '/v1/form/' + getParameterByName('code'),
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    student_id: $('#student-id').val(),
+                    checkin_time: $('#checkin-time').val(),
+                    question_answer: $('#question-answer').val()
+                }),
+                success: function (data) {
+                    alert(data.message);
+                },
+                error: function () {
+                    alert('An error occurred');
+                }
+            });
+        });
+
+        // Get the value of a URL parameter
+        function getParameterByName(name, url) {
+            if (!url) {
+                url = window.location.href;
+            }
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) {
+                return null;
+            }
+            if (!results[2]) {
+                return '';
+            }
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+    });
+</script>
 </body>
 
 </html>
