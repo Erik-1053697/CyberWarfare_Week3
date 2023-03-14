@@ -7,7 +7,8 @@
     <meta charset="utf-8">
     <meta name="author" content="Kodinger">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>HR - Check-in</title>
+    <title>HR | Check-in</title>
+    <link rel="shortcut icon" href="static/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity=""
         crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="static/my-login.css">
@@ -23,15 +24,15 @@
                     <div class="brand">
                         <img src="static/hr.png" alt="logo">
                     </div>
-
                     <div class="card fat">
                         <div class="card-body">
+
                             <div class="login">
                                 <h1>Scan QR to Check-in</h1>
-                                <img id="qr-code" alt="QR code">
-                                <br>
-                                <a id="qr-link" class="btn btn-primary" href="/form?code={{ code }}">QR code link</a>
+                                <img src="data:image/png;base64, {{ qr_code }}" alt="QR code"><br><br>
+                                <a href="{{ url }}" class="btn btn-primary">QR Code link</a>
                             </div>
+
                         </div>
                     </div>
                     <div class="footer">
@@ -44,27 +45,28 @@
 
     <script>
 
-        $(document).ready(function () {
-            // Make an AJAX call to the /api/checkin endpoint
-            $.ajax({
-                type: "GET",
-                url: "/v1/checkin",
-                dataType: "json",
-                success: function (response) {
-                    // Set the src attribute of the QR code image with the base64-encoded image data
-                    $("#qr-code").attr("src", "data:image/png;base64," + response.qr_code);
-                    // Set the href attribute of the QR code link with the URL
-                    $("#qr-link").attr("href", response.url);
+        // $(document).ready(function () {
+        //     // Make an AJAX call to the /api/checkin endpoint
+        //     $.ajax({
+        //         type: "GET",
+        //         url: "/v1/checkin",
+        //         dataType: "json",
+        //         success: function (response) {
+        //             // Set the src attribute of the QR code image with the base64-encoded image data
+        //             $("#qr-code").attr("src", "data:image/png;base64," + response.qr_code);
+        //             // Set the href attribute of the QR code link with the URL
+        //             $("#qr-link").attr("href", response.url);
 
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert("An error occurred while trying to check in: " + errorThrown);
-                }
-            });
-        });
+        //         },
+        //         error: function (jqXHR, textStatus, errorThrown) {
+        //             alert("An error occurred while trying to check in: " + errorThrown);
+        //         }
+        //     });
+        // });
 
     </script>
 
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 

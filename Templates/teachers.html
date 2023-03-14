@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div id="layoutSidenav_content">
+
+    <div class="container-fluid px-4">
+        <h2 class="mt-4">Teachers</h2>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item active">Teachers</li>
+        </ol>
+
+        <button type="button" id="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTeacherModal">
+            Create Teacher
+        </button><br><br>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Manage Teachers
+            </div>
+            <div class="card-body">
+                <table id="teachers-table" class="display">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <!-- <th>Date</th>
+                            <th>Time</th> -->
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Button to trigger modal -->
+    <div class="modal fade" id="createTeacherModal" tabindex="-1" aria-labelledby="createTeacherModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTeacherModalLabel">Create Teacher</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-teacher-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="text" class="form-control" id="email" name="email" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="create-meeting-btn">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit meeting modal -->
+    <div class="modal fade" id="editMeetingModal" tabindex="-1" aria-labelledby="editTeacherModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTeacherModalLabel">Edit Teacher</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-teacher-form">
+                        <input type="hidden" id="edit-teacher-id" name="id">
+                        <div class="mb-3">
+                            <label for="edit-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="edit-title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-teacher" name="teacher" required>
+                        </div>
+                        <!-- <div class="mb-3">
+                            <label for="edit-date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="edit-date" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-time" class="form-label">Time</label>
+                            <input type="time" class="form-control" id="edit-time" name="time" required>
+                        </div> -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="update-teacher-btn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Submit form when create button is clicked
+        $('#create-teacher-btn').click(function () {
+            $('#create-teacher-form').submit();
+        });
+
+        // Clear form fields and remove active class when modal is closed
+        $('#createTeacherModal').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
+        });
+
+        // Clear form fields when update modal is closed
+        $('#updateTeacherModal').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
+        });
+
+        // Validate form
+        function validateForm() {
+            var form = document.getElementById("edit-teacher-form");
+            var form = document.getElementById("create-teacher-form");
+            if (!form.checkValidity()) {
+                // If the form is not valid, display an error message
+                alert("Please fill in all required fields.");
+                return false;
+            }
+            return true;
+        }
+
+        // Show all teachers
+        $.ajax({
+            url: '/v1/teacher',
+            type: 'GET',
+            success: function (response) {
+                console.log(response);
+                var table = $('#teachers-table').DataTable({
+                    responsive: true,
+                    data: response,
+                    columns: [
+                        { data: 'id' },
+                        { data: 'username' },
+                        { data: 'name' },
+                        // { data: 'date' },
+                        // { data: 'time' },
+                        {
+                            data: null,
+                            render: function (data, type, row) {
+                                return '<button class="edit-button btn btn-primary btn-margin" data-id="' + data.id + '"><i class="fas fa-edit"></i></button>' +
+                                    '<button class="delete-button btn btn-danger" data-id="' + data.id + '"><i class="fas fa-trash"></i></button>';
+                            }
+                        }
+                    ]
+                });
+
+                // Add a new meeting
+                $('#create-teacher-form').submit(function (event) {
+                    event.preventDefault();
+                    if (validateForm()) {
+                        $.ajax({
+                            url: '/v1/teacher',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                username: $('#username').val(),
+                                name: $('#name').val(),
+                            }),
+                            success: function () {
+                                alert('Teacher created successfully');
+                                $('#createTeacherModal').modal('hide'); // hide the modal
+                                location.reload(); // Reload the page
+                            },
+                            error: function (error) {
+                                console.log(error);
+                                alert('Failed to create meeting');
+                            }
+                        });
+                    }
+                });
+
+                // Update meeting
+                $('#update-teacher-btn').on('click', function (event) {
+                    var data = {};
+                    $('#edit-teacher-form').serializeArray().map(function (item) {
+                        data[item.name] = item.value;
+                    });
+
+                    $.ajax({
+                        url: '/v1/teacher/' + id,
+                        type: 'PUT',
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+
+                        success: function () {
+                            alert('Teacher updated successfully');
+                            $('#editTeacherModal').modal('hide');
+                            location.reload(); // Reload the page
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            alert('Failed to update teacher data');
+                        }
+                    });
+                });
+
+                // Edit meeting
+                $('#teacher-table').on('click', '.edit-button', function () {
+                    id = $(this).data('id');
+                    $.ajax({
+                        url: '/v1/teacher/' + id,
+                        type: 'GET',
+                        success: function (meeting) {
+                            $('#editMeetingModal #edit-meeting-id').val(meeting.id);
+                            $('#editMeetingModal #edit-title').val(meeting.title);
+                            $('#editMeetingModal #edit-teacher').val(meeting.teacher);
+                            $('#editMeetingModal #edit-date').val(meeting.date);
+                            $('#editMeetingModal #edit-time').val(meeting.time);
+                            $('#editMeetingModal').modal('show');
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            alert('Failed to retrieve meeting data');
+                        }
+                    });
+                });
+
+                // Delete meeting
+                $('#meetings-table').on('click', '.delete-button', function () {
+                    var id = $(this).data('id');
+                    if (confirm('Are you sure you want to delete this meeting?')) {
+                        $.ajax({
+                            url: '/v1/meeting/' + id,
+                            type: 'DELETE',
+                            success: function () {
+                                alert('Meeting deleted successfully');
+                                location.reload(); // Reload the page
+
+                            },
+                            error: function (error) {
+                                console.log(error);
+                                alert('Failed to delete meeting');
+                            }
+                        });
+                    }
+                });
+            },
+            error: function (error) {
+                console.log(error);
+                alert('Failed to get meetings');
+            }
+        });
+
+    </script>
+
+    {% endblock %}

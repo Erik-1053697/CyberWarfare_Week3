@@ -39,9 +39,16 @@
                                             name="checkin_time" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="question-answer">Question answer:</label>
+                                        <label for="question-answer">How are you doing today:</label>
                                         <input type="text" class="form-control" id="question-answer"
                                             name="question_answer" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="status">Status:</label>
+                                        <select class="form-control" id="status" name="status" required>
+                                            <option value="present">Present</option>
+                                            <option value="absent">Absent</option>
+                                        </select>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>
@@ -79,10 +86,14 @@
                 data: JSON.stringify({
                     student_id: $('#student-id').val(),
                     checkin_time: $('#checkin-time').val(),
-                    question_answer: $('#question-answer').val()
+                    question_answer: $('#question-answer').val(),
+                    status: $('#status').val()
                 }),
                 success: function (data) {
+
                     alert(data.message);
+                    // Redirect to login page
+                    window.location.replace('/login');
                 },
                 error: function () {
                     alert('An error occurred');

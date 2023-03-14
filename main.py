@@ -42,10 +42,10 @@ def students():
         username = session.get('username', '')
         return render_template('students.html', user=username)
 
-@app.route('/checkin')
-def checkin():
-    code = request.args.get('code')
-    return render_template('checkin.html', code=code)
+# @app.route('/checkin')
+# def checkin():
+#     code = request.args.get('code')
+#     return render_template('checkin.html', code=code)
 
 
 # render index template
@@ -320,7 +320,7 @@ def delete_student(student_id):
     return jsonify(response), 204
 
 # get teacher
-@app.route('/teacher', methods=['GET'])
+@app.route('/v1/teacher', methods=['GET'])
 def get_teachers():
     conn = sqlite3.connect('./database/wp3.db')
     cursor = conn.cursor()
@@ -330,7 +330,7 @@ def get_teachers():
     return jsonify(rows)
 
 # save teacher
-@app.route('/teacher', methods=['POST'])
+@app.route('/v1/teacher', methods=['POST'])
 def save_teacher():
     conn = sqlite3.connect('./database/wp3.db')
     cursor = conn.cursor()
@@ -341,7 +341,7 @@ def save_teacher():
     return jsonify({'id': new_teacher_id})
 
 # show specific teacher
-@app.route('/teacher/<int:id>', methods=['GET'])
+@app.route('/v1/teacher/<int:id>', methods=['GET'])
 def get_teacher(id):
     conn = sqlite3.connect('./database/wp3.db')
     cursor = conn.cursor()
@@ -353,7 +353,7 @@ def get_teacher(id):
     return jsonify(row)
 
 # update teacher
-@app.route('/teacher/<int:id>', methods=['PUT'])
+@app.route('/v1/teacher/<int:id>', methods=['PUT'])
 def update_teacher(id):
     conn = sqlite3.connect('./database/wp3.db')
     cursor = conn.cursor()
@@ -363,7 +363,7 @@ def update_teacher(id):
     return jsonify({'success': True})
 
 # delete teacher
-@app.route('/teacher/<int:id>', methods=['DELETE'])
+@app.route('/v1/teacher/<int:id>', methods=['DELETE'])
 def delete_teacher(id):
     conn = sqlite3.connect('./database/wp3.db')
     cursor = conn.cursor()
@@ -447,9 +447,11 @@ def delete_class(class_id):
     return jsonify({'message': 'Class deleted successfully'})
 
 # QR code
-@app.route("/v1/checkin", methods=["GET"])
+@app.route("/checkin", methods=["GET"])
 def check_in():
     connection = sqlite3.connect('./database/wp3.db')
+    cursor = connection.cursor()
+
     # Generate a new QR code with a unique ID and URL
     code = str(uuid.uuid4())
     url = "/form?code=" + code
@@ -477,11 +479,7 @@ def check_in():
     img.save(buffer, "PNG")
     qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-    response = {
-        "qr_code": qr_code,
-        "url": url
-    }
-    return jsonify(response)
+    return render_template("checkin.html", qr_code=qr_code, url=url)
 
 @app.route('/v1/form', methods=['GET'])
 def get_form():
@@ -490,33 +488,26 @@ def get_form():
     students = conn.execute('SELECT * FROM checkins').fetchall()
     conn.commit()
     conn.close()
-    return jsonify([{'id': row[0], 'qr_code_id': row[1], 'student_id': row[2], 'checkin_time': row[3] , 'question_answer': [row[4]]} for row in students])
+    return jsonify([{'id': row[0], 'qr_code_id': row[1], 'student_id': row[2], 'checkin_time': row[3] , 'question_answer': row[4], 'status': row[5]} for row in students])
 
 # route for submitting the check-in form
 @app.route("/v1/form/<code>", methods=['POST'])
 def submit_form(code):
-    try:
+    
         request_data = request.get_json()
 
         student_id = request_data["student_id"]
         checkin_time = request_data["checkin_time"]
         question_answer = request_data["question_answer"]
+        status = request_data["status"]
 
         connection = sqlite3.connect("./database/wp3.db")
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO checkins (student_id, checkin_time, question_answer, qr_code_id) VALUES (?, ?, ?, ?)", (student_id, checkin_time, question_answer, code))
+        cursor.execute("INSERT INTO checkins (student_id, checkin_time, question_answer, qr_code_id, status) VALUES (?, ?, ?, ?, ?)", (student_id, checkin_time, question_answer, code, status))
         connection.commit()
         cursor.close()
         
-        response = {
-            "message": "Student {student_id} checked in at {checkin_time}"
-        }
-        return jsonify(response), 200
-    except Exception as e:
-        response = {
-            "message": "An error occurred"
-        }
-        return jsonify(response), 500
+        return jsonify({'message': f'Student {student_id} checked in at {checkin_time} with status {status}'}), 200
 
 # logout page
 @app.route('/logout')

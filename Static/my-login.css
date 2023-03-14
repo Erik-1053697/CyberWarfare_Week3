@@ -36,9 +36,9 @@ body.my-login-page {
 	width: 400px;
 }
 
-/* .my-login-checkin .card-wrapper-checkin {
+.my-login-checkin .card-wrapper-checkin {
 	width: 400px;
-} */
+}
 
 .my-login-page .card {
 	border-color: transparent;
