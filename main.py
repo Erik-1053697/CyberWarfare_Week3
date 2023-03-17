@@ -73,6 +73,11 @@ def classes():
 def show_form():
     return render_template("form.html")
 
+# Render attendance template
+@app.route('/attendance')
+def attendance():
+    return render_template('attendance.html')
+
 # login
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
@@ -519,6 +524,16 @@ def logout():
    # session.pop('role', None)
    # redirect to login page
    return redirect(url_for('login'))
+
+# show attendance
+@app.route('/v1/attendance', methods=['GET'])
+def get_attendance():
+    conn = sqlite3.connect('./database/wp3.db')
+    conn.cursor()
+    attendance = conn.execute('SELECT * FROM attendance').fetchall()
+    conn.commit()
+    conn.close()
+    return jsonify([{'id': row[0], 'student_id': row[1], 'qr_code_id': row[2], 'check_in_time': row[3] , 'status': [row[4]]} for row in attendance])
 
 # run python application
 if __name__ == '__main__':
