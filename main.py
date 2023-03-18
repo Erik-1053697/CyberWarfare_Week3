@@ -53,6 +53,11 @@ def students():
 # def index():
 #     return render_template('index.html')
 
+# render index template
+# @app.route('/attendance')
+# def attendance():
+#     return render_template('attendance.html')
+
 # Render calendar template
 @app.route('/calendar')
 def calendar():
@@ -74,7 +79,6 @@ def show_form():
     return render_template("form.html")
 
 # login
-@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -327,16 +331,23 @@ def get_teachers():
     cursor.execute('SELECT * FROM teachers')
     rows = cursor.fetchall()
     conn.close()
-    return jsonify(rows)
+
+    # Convert rows to a list of dictionaries
+    teachers = []
+    for row in rows:
+        teacher = {'id': row[0], 'username': row[1], 'password': row[2], 'email': row[3]}
+        teachers.append(teacher)
+
+    return jsonify(teachers)
 
 # save teacher
 @app.route('/v1/teacher', methods=['POST'])
 def save_teacher():
     conn = sqlite3.connect('./database/wp3.db')
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO teachers (username, password, name) VALUES (?, ?, ?)', (request.json['username'], request.json['password'], request.json['name']))
+    cursor.execute('INSERT INTO teachers (username, password, email) VALUES (?, ?, ?)', (request.json['username'], request.json['password'], request.json['email']))
     conn.commit()
-    new_teacher_id = cursor.lastrowid
+    new_teacher_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
     conn.close()
     return jsonify({'id': new_teacher_id})
 
@@ -447,6 +458,7 @@ def delete_class(class_id):
     return jsonify({'message': 'Class deleted successfully'})
 
 # QR code
+@app.route('/')
 @app.route("/checkin", methods=["GET"])
 def check_in():
     connection = sqlite3.connect('./database/wp3.db')
@@ -508,6 +520,25 @@ def submit_form(code):
         cursor.close()
         
         return jsonify({'message': f'Student {student_id} checked in at {checkin_time} with status {status}'}), 200
+
+@app.route('/v1/meeting/<int:meeting_id>/attendance', methods=['GET'])
+def get_attendance(meeting_id):
+    conn = sqlite3.connect('./database/wp3.db')
+    cursor = conn.cursor()
+
+    # perform inner joins between the `students`, `checkins`, and `meetings` tables
+    cursor.execute('SELECT students.username, checkins.status, checkins.checkin_time FROM students INNER JOIN checkins ON students.id = checkins.student_id INNER JOIN meetings ON checkins.meeting_id = meetings.id WHERE meetings.id = ?', (meeting_id,))
+    rows = cursor.fetchall()
+
+    # format the results as a list of dictionaries
+    results = []
+    for row in rows:
+        result = {'username': row[0], 'status': row[1]}
+        results.append(result)
+
+    conn.close()
+
+    return jsonify({'present': results})
 
 # logout page
 @app.route('/logout')
