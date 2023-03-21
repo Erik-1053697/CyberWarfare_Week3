@@ -9,7 +9,7 @@
         <meta name="description" content="" />
         <meta name="author" content="The Steves" />
         <link rel="icon" type="image/x-icon" href="static/favicon.ico">
-        <title>HR | Dashboard</title>
+        <title>Dashboard</title>
         <!-- Style -->
         <link href="static/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -19,17 +19,15 @@
 
     <body data-menu="vertical-menu" class="vertical-layout vertical-menu 2-columns container boxed-layout">
 
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="/dashboard">HR // dashboard</a>
-        </nav>
-
         <!-- urls -->
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
                 <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
+                            <a class="navbar-brand" href="#">
+                                <img src="static/hr.png" width="100" height="100" alt="">
+                            </a>
                             <!--main--->
                             <div class="sb-sidenav-menu-heading">Main</div>
                             <a class="nav-link" href="/dashboard">
@@ -63,7 +61,7 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Check-in
                             </a> -->
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="/attendance">
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-clipboard-user"></i></div>
                                 Attendance
                             </a>
