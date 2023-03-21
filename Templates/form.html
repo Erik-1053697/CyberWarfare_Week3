@@ -29,6 +29,11 @@
 
                                 <form id="checkin-form">
                                     <div class="form-group">
+                                        <label for="meeting-id">Meeting ID:</label>
+                                        <input type="text" class="form-control" id="meeting-id" name="meeting_id"
+                                            required>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="student-id">Student ID:</label>
                                         <input type="text" class="form-control" id="student-id" name="student_id"
                                             required>
@@ -86,6 +91,7 @@
                     student_id: $('#student-id').val(),
                     checkin_time: $('#checkin-time').val(),
                     question_answer: $('#question-answer').val(),
+                    meeting_id: $('#meeting-id').val(),
                     status: $('#status').val()
                 }),
                 success: function (data) {

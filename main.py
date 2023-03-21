@@ -210,16 +210,42 @@ def get_meeting(id):
     else:
         return jsonify({'error': 'Meeting not found'})
 
+# get meetings
+@app.route("/v1/meeting")
+def get_meetings():
+    connection = sqlite3.connect("./database/wp3.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+
+    # Fetch meetings data along with check-ins for each meeting using a JOIN query
+    cursor.execute("""
+         SELECT m.id, m.title, m.teacher, m.date, m.time,
+  GROUP_CONCAT(CASE WHEN a.status = 'present' THEN a.student_id ELSE NULL END) AS present,
+  GROUP_CONCAT(CASE WHEN a.status = 'absent' THEN a.student_id ELSE NULL END) AS absent
+FROM meetings m
+LEFT JOIN (
+  SELECT meeting_id, student_id, status
+  FROM checkins
+  GROUP BY meeting_id, student_id
+) a ON m.id = a.meeting_id
+GROUP BY m.id
+    """)
+
+    # Convert data to a list of dictionaries and return as JSON
+    data = [dict(row) for row in cursor.fetchall()]
+    return jsonify(data)
+
+
 # Show all meetings
 @app.route('/v1/meeting', methods=['GET'])
 def get_all_meetings():
     conn = sqlite3.connect('./database/wp3.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM meetings")
+    c.execute("SELECT m.id, m.title, m.teacher, m.date, m.time, COUNT(c.id) AS total_checkins, COUNT(CASE WHEN c.status = 'present' THEN 1 END) AS present_count FROM meetings m LEFT JOIN checkins c ON m.id = c.meeting_id LEFT JOIN students s ON c.student_id = s.id GROUP BY m.id")
     meetings = c.fetchall()
     conn.close()
     # Convert the list of tuples to a list of dictionaries
-    meetings_dict = [dict(zip(('id', 'title', 'teacher', 'date', 'time'), m)) for m in meetings]
+    meetings_dict = [dict(zip(('id', 'title', 'teacher', 'date', 'time', 'total_checkins', 'present_count'), m)) for m in meetings]
     return jsonify(meetings_dict)
 
 # Show all meetings for a teacher
@@ -498,15 +524,6 @@ def check_in():
 
     return render_template("checkin.html", qr_code=qr_code, url=url)
 
-@app.route('/v1/form', methods=['GET'])
-def get_form():
-    conn = sqlite3.connect('./database/wp3.db')
-    conn.cursor()
-    students = conn.execute('SELECT * FROM checkins').fetchall()
-    conn.commit()
-    conn.close()
-    return jsonify([{'id': row[0], 'qr_code_id': row[1], 'student_id': row[2], 'checkin_time': row[3] , 'question_answer': row[4], 'status': row[5]} for row in students])
-
 # route for submitting the check-in form
 @app.route("/v1/form/<code>", methods=['POST'])
 def submit_form(code):
@@ -516,34 +533,25 @@ def submit_form(code):
         student_id = request_data["student_id"]
         checkin_time = request_data["checkin_time"]
         question_answer = request_data["question_answer"]
+        meeting_id = request_data["meeting_id"]
         status = request_data["status"]
-
+        
         connection = sqlite3.connect("./database/wp3.db")
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO checkins (student_id, checkin_time, question_answer, qr_code_id, status) VALUES (?, ?, ?, ?, ?)", (student_id, checkin_time, question_answer, code, status))
+        cursor.execute("INSERT INTO checkins (student_id, checkin_time, question_answer, qr_code_id, meeting_id, status) VALUES (?, ?, ?, ?, ?, ?)", (student_id, checkin_time, question_answer, code, meeting_id, status))
         connection.commit()
         cursor.close()
         
         return jsonify({'message': f'Student {student_id} checked in at {checkin_time} with status {status}'}), 200
 
-@app.route('/v1/meeting/<int:meeting_id>/attendance', methods=['GET'])
-def get_attendance(meeting_id):
+@app.route('/v1/attendance', methods=['GET'])
+def get_attendance():
     conn = sqlite3.connect('./database/wp3.db')
-    cursor = conn.cursor()
-
-    # perform inner joins between the `students`, `checkins`, and `meetings` tables
-    cursor.execute('SELECT students.username, checkins.status, checkins.checkin_time FROM students INNER JOIN checkins ON students.id = checkins.student_id INNER JOIN meetings ON checkins.meeting_id = meetings.id WHERE meetings.id = ?', (meeting_id,))
-    rows = cursor.fetchall()
-
-    # format the results as a list of dictionaries
-    results = []
-    for row in rows:
-        result = {'username': row[0], 'status': row[1]}
-        results.append(result)
-
+    conn.cursor()
+    checkins = conn.execute('SELECT * FROM checkins').fetchall()
+    conn.commit()
     conn.close()
-
-    return jsonify({'present': results})
+    return jsonify([{'id': row[0], 'student_id': row[2], 'qr_code_id': row[1], 'checkin_time': row[3] , 'question_answer': row[4], 'status': [row[6]]} for row in checkins])
 
 # logout page
 @app.route('/logout')
@@ -557,14 +565,14 @@ def logout():
    return redirect(url_for('login'))
 
 # show attendance
-@app.route('/v1/attendance', methods=['GET'])
-def get_attendance():
-    conn = sqlite3.connect('./database/wp3.db')
-    conn.cursor()
-    attendance = conn.execute('SELECT * FROM attendance').fetchall()
-    conn.commit()
-    conn.close()
-    return jsonify([{'id': row[0], 'student_id': row[1], 'qr_code_id': row[2], 'check_in_time': row[3] , 'status': [row[4]]} for row in attendance])
+# @app.route('/v1/attendance', methods=['GET'])
+# def get_attendance():
+#     conn = sqlite3.connect('./database/wp3.db')
+#     conn.cursor()
+#     attendance = conn.execute('SELECT * FROM attendance').fetchall()
+#     conn.commit()
+#     conn.close()
+#     return jsonify([{'id': row[0], 'student_id': row[1], 'qr_code_id': row[2], 'check_in_time': row[3] , 'status': [row[4]]} for row in attendance])
 
 # run python application
 if __name__ == '__main__':
