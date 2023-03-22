@@ -224,7 +224,7 @@ def get_meetings():
        GROUP_CONCAT(CASE WHEN a.status = 'absent' THEN c.student_id ELSE NULL END) AS absent
 FROM meetings m
 LEFT JOIN checkins a ON m.id = a.meeting_id
-LEFT JOIN checkins c ON a.meeting_id = c.meeting_id
+LEFT JOIN checkins c ON a.id = c.id AND a.meeting_id = c.meeting_id
 GROUP BY m.id
     """)
 
