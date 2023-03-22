@@ -220,33 +220,31 @@ def get_meetings():
     # Fetch meetings data along with check-ins for each meeting using a JOIN query
     cursor.execute("""
          SELECT m.id, m.title, m.teacher, m.date, m.time,
-  GROUP_CONCAT(CASE WHEN a.status = 'present' THEN a.student_id ELSE NULL END) AS present,
-  GROUP_CONCAT(CASE WHEN a.status = 'absent' THEN a.student_id ELSE NULL END) AS absent
+       GROUP_CONCAT(CASE WHEN a.status = 'present' THEN c.student_id ELSE NULL END) AS present,
+       GROUP_CONCAT(CASE WHEN a.status = 'absent' THEN c.student_id ELSE NULL END) AS absent
 FROM meetings m
-LEFT JOIN (
-  SELECT meeting_id, student_id, status
-  FROM checkins
-  GROUP BY meeting_id, student_id
-) a ON m.id = a.meeting_id
+LEFT JOIN checkins a ON m.id = a.meeting_id
+LEFT JOIN checkins c ON a.meeting_id = c.meeting_id
 GROUP BY m.id
     """)
 
     # Convert data to a list of dictionaries and return as JSON
-    data = [dict(row) for row in cursor.fetchall()]
+    meetings = [dict(row) for row in cursor.fetchall()]
+    data = {"meetings": meetings}
     return jsonify(data)
 
 
 # Show all meetings
-@app.route('/v1/meeting', methods=['GET'])
-def get_all_meetings():
-    conn = sqlite3.connect('./database/wp3.db')
-    c = conn.cursor()
-    c.execute("SELECT m.id, m.title, m.teacher, m.date, m.time, COUNT(c.id) AS total_checkins, COUNT(CASE WHEN c.status = 'present' THEN 1 END) AS present_count FROM meetings m LEFT JOIN checkins c ON m.id = c.meeting_id LEFT JOIN students s ON c.student_id = s.id GROUP BY m.id")
-    meetings = c.fetchall()
-    conn.close()
-    # Convert the list of tuples to a list of dictionaries
-    meetings_dict = [dict(zip(('id', 'title', 'teacher', 'date', 'time', 'total_checkins', 'present_count'), m)) for m in meetings]
-    return jsonify(meetings_dict)
+# @app.route('/v1/meeting', methods=['GET'])
+# def get_all_meetings():
+#     conn = sqlite3.connect('./database/wp3.db')
+#     c = conn.cursor()
+#     c.execute("SELECT m.id, m.title, m.teacher, m.date, m.time, COUNT(c.id) AS total_checkins, COUNT(CASE WHEN c.status = 'present' THEN 1 END) AS present_count FROM meetings m LEFT JOIN checkins c ON m.id = c.meeting_id LEFT JOIN students s ON c.student_id = s.id GROUP BY m.id")
+#     meetings = c.fetchall()
+#     conn.close()
+#     # Convert the list of tuples to a list of dictionaries
+#     meetings_dict = [dict(zip(('id', 'title', 'teacher', 'date', 'time', 'total_checkins', 'present_count'), m)) for m in meetings]
+#     return jsonify(meetings_dict)
 
 # Show all meetings for a teacher
 @app.route('/v1/meeting/<teacher>', methods=['GET'])
@@ -530,10 +528,11 @@ def submit_form(code):
     
         request_data = request.get_json()
 
+        meeting_id = request_data["meeting_id"]
         student_id = request_data["student_id"]
         checkin_time = request_data["checkin_time"]
         question_answer = request_data["question_answer"]
-        meeting_id = request_data["meeting_id"]
+        
         status = request_data["status"]
         
         connection = sqlite3.connect("./database/wp3.db")
@@ -551,7 +550,7 @@ def get_attendance():
     checkins = conn.execute('SELECT * FROM checkins').fetchall()
     conn.commit()
     conn.close()
-    return jsonify([{'id': row[0], 'student_id': row[2], 'qr_code_id': row[1], 'checkin_time': row[3] , 'question_answer': row[4], 'status': [row[6]]} for row in checkins])
+    return jsonify([{'id': row[0], 'student_id': row[2], 'qr_code_id': row[1], 'checkin_time': row[3] , 'question_answer': row[4], 'meeting_id': row[5],'status': [row[6]]} for row in checkins])
 
 # logout page
 @app.route('/logout')

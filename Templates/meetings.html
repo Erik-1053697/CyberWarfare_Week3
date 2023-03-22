@@ -115,8 +115,6 @@
 
     <script>
 
-
-
         // Submit form when create button is clicked
         $('#create-meeting-btn').click(function () {
             $('#create-meeting-form').submit();
@@ -164,13 +162,11 @@
                             render: function (data, type, row) {
                                 return '<button class="edit-button btn btn-primary btn-margin" data-id="' + data.id + '"><i class="fas fa-edit"></i></button>' +
                                     '<button class="delete-button btn btn-danger" data-id="' + data.id + '"><i class="fas fa-trash"></i></button>' +
-                                    '<a class="attendance-button btn btn-success" href="/v1/meetings/' + data.id + '/attendance">Attendance</a>';
+                                    '<a class="attendance-button btn btn-success" href="/v1/meeting/' + data.id + '/attendance">Attendance</a>';
                             }
                         }
                     ]
                 });
-
-
 
                 // Add a new meeting
                 $('#create-meeting-form').submit(function (event) {
