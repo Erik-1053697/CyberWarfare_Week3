@@ -550,7 +550,34 @@ def get_attendance():
     checkins = conn.execute('SELECT * FROM checkins').fetchall()
     conn.commit()
     conn.close()
-    return jsonify([{'id': row[0], 'student_id': row[2], 'qr_code_id': row[1], 'checkin_time': row[3] , 'question_answer': row[4], 'meeting_id': row[5],'status': [row[6]]} for row in checkins])
+    return jsonify([{'id': row[0], 'student_id': row[2], 'qr_code_id': row[1], 'checkin_time': row[3] , 'question_answer': row[4], 'meeting_id': row[5], 'status': [row[6] ]} for row in checkins])
+
+
+@app.route('/v1/meeting/<int:meeting_id>/attendance')
+def get_attendance_data(meeting_id):
+    print(meeting_id)  
+    conn = sqlite3.connect('./database/wp3.db')
+    c = conn.cursor()
+
+    # Fetch attendance data for the given meeting ID
+    c.execute("SELECT student_id, status FROM checkins WHERE meeting_id=?", (meeting_id,))
+    rows = c.fetchall()
+    print(rows)  
+
+    attendance_data = []
+    for row in rows:
+        name = row[0]
+        status = row[1] if row[1] is not None else 'absent'
+        attendance_data.append({'name': name, 'status': status})
+
+
+    response_data = {'attendance': attendance_data}
+
+    conn.close()
+
+    print(response_data)
+
+    return jsonify(response_data)
 
 # logout page
 @app.route('/logout')
