@@ -161,8 +161,8 @@
                             data: null,
                             render: function (data, type, row) {
                                 return '<button class="edit-button btn btn-primary" data-id="' + data.id + '"><i class="fas fa-edit"></i></button>' +
-                                    '<button class="delete-button btn btn-danger" data-id="' + data.id + '"><i class="fas fa-trash"></i></button>' +
-                                    '<a class="attendance-button btn btn-success" href="/v1/meeting/' + data.id + '/attendance">Attendance</a>';
+                                    '<a class="attendance-button btn btn-success" href="/v1/meeting/' + data.id + '/attendance"><i class="fa-solid fa-clipboard-user"></i></a>' +
+                                    '<button class="delete-button btn btn-danger" data-id="' + data.id + '"><i class="fas fa-trash"></i></button>'
                             }
                         }
                     ]
