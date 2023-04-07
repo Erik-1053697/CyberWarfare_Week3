@@ -36,42 +36,65 @@
 
     <script>
 
-        // Show attendance
-        $.ajax({
-            url: '/v1/attendance',
-            type: 'GET',
-            success: function (response) {
-                console.log(response);
-                var table = $('#attendance-table').DataTable({
-                    responsive: true,
-                    data: response,
-                    columns: [
-                        { data: 'id' },
-                        { data: 'student_id' },
-                        { data: 'qr_code_id', visible: false },
-                        { data: 'checkin_time' },
-                        { data: 'question_answer' },
-                        {
-                            data: 'status',
-                            render: function (data, type, row) {
-                                var statusClass = 'badge ';
-                                if (data == 'present') {
-                                    statusClass = 'badge badge-success';
-                                } else if (data == 'absent') {
-                                    statusClass = 'badge badge-danger';
-                                }
-                                return '<span class="' + statusClass + '">' + data + '</span>';
+        // Define a variable to hold the DataTable instance
+        var table;
 
+        $(document).ready(function() {
+            // Initialize the DataTable with empty data
+            table = $('#attendance-table').DataTable({
+                responsive: true,
+                data: [],
+                columns: [
+                    { data: 'id' },
+                    { data: 'student_id' },
+                    { data: 'qr_code_id', visible: false },
+                    { data: 'checkin_time' },
+                    { data: 'question_answer' },
+                    {
+                        data: 'status',
+                        render: function (data, type, row) {
+                            var statusClass = 'badge ';
+                            if (data == 'present') {
+                                statusClass = 'badge badge-success';
+                            } else if (data == 'absent') {
+                                statusClass = 'badge badge-danger';
                             }
+                            return '<span class="' + statusClass + '">' + data + '</span>';
                         }
-                    ]
-                });
-            },
-            error: function (error) {
-                console.log(error);
-                alert('Failed to get attendance');
-            }
+                    }
+                ]
+            });
+
+            // Call the function to load attendance data initially
+            loadAttendance();
+
+            // Call the function to load attendance data every 2 seconds using setInterval
+            setInterval(loadAttendance, 2000);
         });
+
+        // Define a function to load attendance data
+        function loadAttendance() {
+            $.ajax({
+                url: '/v1/attendance',
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+
+                    // Clear the existing data from the DataTable instance, if it exists
+                    table.clear();
+
+                    // Add the new data to the DataTable instance
+                    table.rows.add(response);
+
+                    // Redraw the DataTable instance
+                    table.draw();
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert('Failed to get attendance');
+                }
+            });
+        }
 
 
     </script>
