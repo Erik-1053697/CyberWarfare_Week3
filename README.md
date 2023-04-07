@@ -37,7 +37,7 @@ API:
 Technische eisen:
 - [x] RAC huisstijl
 - [ ] REST URLS niet zonder authenticatie
-- [ ] Tenminste het overzichtsscherm van docent real-time verversen
+- [x] Tenminste het overzichtsscherm van docent real-time verversen
 - [x] Backend python met Flask SQLITE
 - [x] ERD en database. De ERD moet eenduidig zijn
 - [x] SQLITE wordt aangeraden
