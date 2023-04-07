@@ -1,6 +1,6 @@
 # Informatie
 
-In werkplaats 3 staat er een interessante uitdaging te wachten voor de deelnemers. De opdracht luidt namelijk om een tool te ontwikkelen waarmee de aanwezigheid van studenten bijgehouden kan worden tijdens hun studie.
+De opdracht is namelijk om een tool te ontwikkelen waarme de aanwezigheid van studenten bijgehouden kan worden tijdens de studie.
 
 Het bijhouden van de aanwezigheid van studenten is een belangrijk aspect van het onderwijs. Het stelt docenten in staat om een beter beeld te krijgen van het studiegedrag van hun studenten en eventueel bij te sturen waar nodig.
 
@@ -10,17 +10,17 @@ Het is belangrijk dat de tool gebruiksvriendelijk en efficiënt is, zodat docent
 
 Als student:
 
-- [x] wil ik kunnen in-checken
-- [x] naam van eerdere check-in onthouden
-- [x] kan ook zonder QR code inloggen
-- [ ] beveliging onmogelijk om te vervalsen
+- [x] wil ik een check-in kunnen maken
+- [x] check-in van een eerder moment onthouden
+- [x] kan je ook zonder QR code inloggen
+- [ ] niet mogelijk om de check-in te vervalsen
 
 Als docent:
 
 - [x] welke studenten in onze bijeenkomst aanwezig zijn
 - [x] welke studenten nog niet aanwezig zijn
 - [x] welke studenten hebben zich afwezig gemeld
-- [x] hoeveel studenten zich hebben ingechecked
+- [x] hoeveel studenten zich hebben ingecheckt
 - [ ] apart scherm om de check-in te kunnen openen
 - [ ] per bijeenkomst een aanvullende vraag
 - [ ] les tevoren plannen en aangeven wanneer deze start en eindigt
