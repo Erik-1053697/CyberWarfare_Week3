@@ -10,17 +10,38 @@ Het is belangrijk dat de tool gebruiksvriendelijk en efficiënt is, zodat docent
 
 Als student:
 
-- [x] Wil ik kunnen in-checken
-- [x] Naam van eerdere check-in onthouden
-- [x] Kan ook zonder QR code inloggen
-- [ ] Beveliging onmogelijk om te vervalsen
+- [x] wil ik kunnen in-checken
+- [x] naam van eerdere check-in onthouden
+- [x] kan ook zonder QR code inloggen
+- [ ] beveliging onmogelijk om te vervalsen
 
 Als docent:
 
-- [x] Welke studenten in onze bijeenkomst aanwezig zijn
-- [x] Welke studenten nog niet aanwezig zijn
-- [x] Welke studenten hebben zich afwezig gemeld
-- [x] Hoeveel studenten zich hebben ingechecked
+- [x] welke studenten in onze bijeenkomst aanwezig zijn
+- [x] welke studenten nog niet aanwezig zijn
+- [x] welke studenten hebben zich afwezig gemeld
+- [x] hoeveel studenten zich hebben ingechecked
+- [ ] apart scherm om de check-in te kunnen openen
+- [ ] per bijeenkomst een aanvullende vraag
+- [ ] les tevoren plannen en aangeven wanneer deze start en eindigt
+- [ ] wie aanwezig was en hoe laat deze zich heeft ingecheckt en wie was afgemeld
+- [ ] wil per student zien in welke lessen in het verleden heeft ingecheckt
+
+Als beheerder:
+- [ ] manier om snel klassen te kunnen invoegen
+- [ ] veel informatie is niet vereist alleen naam en studentnummer
+
+API:
+- [ ] REST API basis crud elementen kan gebruik maken van swagger
+
+Technische eisen:
+- [x] RAC huisstijl
+- [ ] REST URLS niet zonder authenticatie
+- [ ] Tenminste het overzichtsscherm van docent real-time verversen
+- [x] Backend python met Flask SQLITE
+- [ ] ERD en database. De ERD moet eenduidig zijn
+- [x] SQLITE wordt aangeraden
+
 
 # Structure
 Starter repository voor Werkplaats 3. Deze repository bevat een Flask applicatie met een aantal van de componenten die we ook nodig hebben om de werkplaats opdracht uit te voeren: 
@@ -54,7 +75,7 @@ python main.py
 - Flask
 - Ajax
 - JQuery
-- Javascript
+- JavaScript
 - Bootstrap
 - HTML
 - CSS
@@ -62,5 +83,3 @@ python main.py
 # Credits
 
 Thijs, Erik, Martijn
-
-
