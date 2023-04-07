@@ -7867,7 +7867,8 @@ textarea.form-control-lg {
 
 .bg-dark {
   --bs-bg-opacity: 1;
-  background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity)) !important;
+  /* background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity)) !important; */
+  background-color: rgb(110, 0, 28);
 }
 
 .bg-black {
@@ -11330,6 +11331,8 @@ body {
 }
 
 #layoutSidenav {
+  position:relative;
+  top:20px;
   display: flex;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
 }
@@ -11347,7 +11350,7 @@ body {
   justify-content: space-between;
   min-width: 0;
   flex-grow: 1;
-  min-height: calc(100vh - 56px);
+  min-height: calc(90vh - 56px);
   margin-left: -225px;
   background-color: #fff;
 }

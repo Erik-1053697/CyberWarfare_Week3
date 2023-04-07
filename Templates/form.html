@@ -29,6 +29,11 @@
 
                                 <form id="checkin-form">
                                     <div class="form-group">
+                                        <label for="meeting-id">Meeting:</label>
+                                        <select class="form-control" id="meeting-id" name="meeting_id" required>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="student-id">Student ID:</label>
                                         <input type="text" class="form-control" id="student-id" name="student_id"
                                             required>
@@ -54,14 +59,18 @@
                                 </form>
                             </div>
                         </div>
+
+                    </div>
+                    <div class="footer">
+                        &copy; 2023 &mdash; The Steves
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </body>
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
 <script>
+
 
     // Validate form
     function validateForm() {
@@ -87,6 +96,7 @@
                     student_id: $('#student-id').val(),
                     checkin_time: $('#checkin-time').val(),
                     question_answer: $('#question-answer').val(),
+                    meeting_id: $('#meeting-id').val(),
                     status: $('#status').val()
                 }),
                 success: function (data) {
@@ -97,6 +107,33 @@
                 },
                 error: function () {
                     alert('An error occurred');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            // Retrieve the meetings data from the server
+            $.ajax({
+                url: '/v1/meeting',
+                type: 'GET',
+                success: function (data) {
+                    if (data && data.meetings) {
+                        // Generate the HTML for the meetings dropdown
+                        var meetings = data.meetings;
+                        var meetingDropdown = $('#meeting-id');
+                        for (var i = 0; i < meetings.length; i++) {
+                            var meeting = meetings[i];
+                            var option = $('<option></option>');
+                            option.attr('value', meeting.id);
+                            option.text(meeting.title);
+                            meetingDropdown.append(option);
+                        }
+                    } else {
+                        alert('Invalid response from server');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while retrieving the meetings data');
                 }
             });
         });
