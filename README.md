@@ -28,8 +28,7 @@ Als docent:
 - [ ] wil per student zien in welke lessen in het verleden heeft ingecheckt
 
 Als beheerder:
-- [ ] manier om snel klassen te kunnen invoegen
-- [ ] veel informatie is niet vereist alleen naam en studentnummer
+- [ ] Als Docent wil ik een apart scherm met de details van de check in, zoals QR code en de tijd die je hebt voor aanwezigheid doorgaven
 
 API:
 - [ ] REST API basis crud elementen kan gebruik maken van swagger
